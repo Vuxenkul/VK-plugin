@@ -15,28 +15,26 @@ async function getRunningMap(tabId) {
   }
 }
 
-function makeStatusCard(label, yes) {
-  const el = document.createElement('div');
-  el.className = `status ${yes ? 'ok' : 'no'}`;
-
-  const labelEl = document.createElement('span');
-  labelEl.className = 'label';
-  labelEl.textContent = label;
-
-  const valueEl = document.createElement('span');
-  valueEl.className = 'value';
-  valueEl.textContent = yes ? 'Yes' : 'No';
-
-  el.appendChild(labelEl);
-  el.appendChild(valueEl);
-  return el;
+function makeChip(label, yes, extraClass = '') {
+  const chip = document.createElement('span');
+  chip.className = `chip ${yes ? 'ok' : 'no'} ${extraClass}`.trim();
+  chip.innerHTML = `${label}: <b>${yes ? 'Yes' : 'No'}</b>`;
+  return chip;
 }
 
-function makeHint(text, className = '') {
-  const hint = document.createElement('div');
-  hint.className = `hint ${className}`.trim();
-  hint.textContent = text;
-  return hint;
+function makeMaterialErrorIcon() {
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('class', 'error-icon');
+  svg.setAttribute('aria-hidden', 'true');
+
+  const path = document.createElementNS(ns, 'path');
+  path.setAttribute('fill', 'currentColor');
+  // Material icon: error
+  path.setAttribute('d', 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z');
+  svg.appendChild(path);
+  return svg;
 }
 
 async function render() {
@@ -53,29 +51,32 @@ async function render() {
   const scripts = response?.scripts || [];
 
   list.innerHTML = '';
+  list.className = '';
+
   if (!scripts.length) {
+    list.className = 'list-empty';
     list.textContent = 'No bundled scripts found.';
     return;
   }
 
   for (const script of scripts) {
     const card = document.createElement('div');
-    card.className = 'script-card';
+    card.className = 'item';
 
     const row = document.createElement('div');
-    row.className = 'row';
+    row.className = 'top';
 
-    const titleWrap = document.createElement('div');
+    const left = document.createElement('div');
     const title = document.createElement('div');
     title.className = 'name';
     title.textContent = script.name;
 
-    const version = document.createElement('div');
-    version.className = 'meta';
-    version.innerHTML = `v${script.version}<span class="badge">bundled</span>`;
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.innerHTML = `v${script.version}<span class="badge">bundled</span>`;
 
-    titleWrap.appendChild(title);
-    titleWrap.appendChild(version);
+    left.appendChild(title);
+    left.appendChild(meta);
 
     const toggleWrap = document.createElement('label');
     toggleWrap.className = 'switch';
@@ -97,25 +98,40 @@ async function render() {
       render();
     });
 
-    row.appendChild(titleWrap);
+    row.appendChild(left);
     row.appendChild(toggleWrap);
     card.appendChild(row);
 
-    const statusGrid = document.createElement('div');
-    statusGrid.className = 'status-grid';
-    statusGrid.appendChild(makeStatusCard('Matches this page', script.matchesPage));
-
     const runtime = runningMap[script.id] || {};
     const ran = !!runtime.ran;
-    statusGrid.appendChild(makeStatusCard('Running / ran', ran));
-    card.appendChild(statusGrid);
+
+    const status = document.createElement('div');
+    status.className = 'status';
+
+    const matchChip = makeChip('Matches', script.matchesPage, 'match-chip');
+    const dot = document.createElement('span');
+    dot.className = `match-dot ${script.matchesPage ? 'on' : ''}`;
+    matchChip.prepend(dot);
+
+    status.appendChild(matchChip);
+    status.appendChild(makeChip('Ran', ran));
+    card.appendChild(status);
 
     if (runtime.error) {
-      card.appendChild(makeHint(`Execution error: ${runtime.error}`, 'error'));
+      const err = document.createElement('div');
+      err.className = 'error-row';
+      err.appendChild(makeMaterialErrorIcon());
+      const text = document.createElement('span');
+      text.textContent = `Could not run: ${runtime.error}`;
+      err.appendChild(text);
+      card.appendChild(err);
     }
 
     if (!toggle.checked && ran) {
-      card.appendChild(makeHint('Reload tab to fully disable effects.'));
+      const hint = document.createElement('div');
+      hint.className = 'hint';
+      hint.textContent = 'Reload tab to fully disable effects.';
+      card.appendChild(hint);
     }
 
     list.appendChild(card);

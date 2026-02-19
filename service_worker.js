@@ -106,23 +106,38 @@ async function injectScript(tabId, script) {
     return;
   }
 
-  await chrome.scripting.executeScript({
-    target: { tabId },
-    files: [script.file]
-  });
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      files: [script.file]
+    });
 
-  await chrome.scripting.executeScript({
-    target: { tabId },
-    func: (scriptId) => {
-      window.__VK_PLUGIN_RUNTIME = window.__VK_PLUGIN_RUNTIME || {};
-      window.__VK_PLUGIN_RUNTIME[scriptId] = {
-        ran: true,
-        error: null,
-        lastRunAt: Date.now()
-      };
-    },
-    args: [script.id]
-  });
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      func: (scriptId) => {
+        window.__VK_PLUGIN_RUNTIME = window.__VK_PLUGIN_RUNTIME || {};
+        window.__VK_PLUGIN_RUNTIME[scriptId] = {
+          ran: true,
+          error: null,
+          lastRunAt: Date.now()
+        };
+      },
+      args: [script.id]
+    });
+  } catch (err) {
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      func: (scriptId, message) => {
+        window.__VK_PLUGIN_RUNTIME = window.__VK_PLUGIN_RUNTIME || {};
+        window.__VK_PLUGIN_RUNTIME[scriptId] = {
+          ran: false,
+          error: message,
+          lastRunAt: Date.now()
+        };
+      },
+      args: [script.id, String(err)]
+    });
+  }
 }
 
 async function evaluateAndInjectForTab(tabId, url) {
