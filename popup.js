@@ -7,7 +7,7 @@ async function getRunningMap(tabId) {
   try {
     const [result] = await chrome.scripting.executeScript({
       target: { tabId },
-      func: () => window.__VK_PLUGIN_RAN || {}
+      func: () => window.__VK_PLUGIN_RUNTIME || {}
     });
     return result?.result || {};
   } catch (_err) {
@@ -77,8 +77,16 @@ async function render() {
     card.appendChild(row);
     card.appendChild(makeStatusLine('matches this page', script.matchesPage));
 
-    const ran = !!runningMap[script.id];
+    const runtime = runningMap[script.id] || {};
+    const ran = !!runtime.ran;
     card.appendChild(makeStatusLine('running/ran', ran));
+
+    if (runtime.error) {
+      const err = document.createElement('div');
+      err.className = 'hint';
+      err.textContent = `execution error: ${runtime.error}`;
+      card.appendChild(err);
+    }
 
     if (!toggle.checked && ran) {
       const hint = document.createElement('div');

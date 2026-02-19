@@ -97,11 +97,28 @@ async function injectScript(tabId, script) {
   await chrome.scripting.executeScript({
     target: { tabId },
     func: (source, scriptId) => {
-      window.__VK_PLUGIN_RAN = window.__VK_PLUGIN_RAN || {};
-      if (window.__VK_PLUGIN_RAN[scriptId]) return;
-      window.__VK_PLUGIN_RAN[scriptId] = true;
-      const runner = new Function(source);
-      runner();
+      window.__VK_PLUGIN_RUNTIME = window.__VK_PLUGIN_RUNTIME || {};
+      const current = window.__VK_PLUGIN_RUNTIME[scriptId] || {};
+
+      if (current.ran) {
+        return;
+      }
+
+      try {
+        const runner = new Function(source);
+        runner();
+        window.__VK_PLUGIN_RUNTIME[scriptId] = {
+          ran: true,
+          error: null,
+          lastRunAt: Date.now()
+        };
+      } catch (err) {
+        window.__VK_PLUGIN_RUNTIME[scriptId] = {
+          ran: false,
+          error: String(err),
+          lastRunAt: Date.now()
+        };
+      }
     },
     args: [script.code, script.id]
   });
@@ -124,9 +141,9 @@ async function handleTab(tabId) {
   await evaluateAndInjectForTab(tabId, tab.url);
 }
 
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  if (changeInfo.status !== 'complete') return;
-  await evaluateAndInjectForTab(tabId, tab.url);
+chrome.webNavigation.onCommitted.addListener(async (details) => {
+  if (details.frameId !== 0) return;
+  await evaluateAndInjectForTab(details.tabId, details.url);
 });
 
 chrome.webNavigation.onHistoryStateUpdated.addListener(async (details) => {
