@@ -15,11 +15,28 @@ async function getRunningMap(tabId) {
   }
 }
 
-function makeStatusLine(label, yes) {
+function makeStatusCard(label, yes) {
   const el = document.createElement('div');
   el.className = `status ${yes ? 'ok' : 'no'}`;
-  el.textContent = `${label}: ${yes ? 'yes' : 'no'}`;
+
+  const labelEl = document.createElement('span');
+  labelEl.className = 'label';
+  labelEl.textContent = label;
+
+  const valueEl = document.createElement('span');
+  valueEl.className = 'value';
+  valueEl.textContent = yes ? 'Yes' : 'No';
+
+  el.appendChild(labelEl);
+  el.appendChild(valueEl);
   return el;
+}
+
+function makeHint(text, className = '') {
+  const hint = document.createElement('div');
+  hint.className = `hint ${className}`.trim();
+  hint.textContent = text;
+  return hint;
 }
 
 async function render() {
@@ -49,17 +66,26 @@ async function render() {
     row.className = 'row';
 
     const titleWrap = document.createElement('div');
-    const title = document.createElement('strong');
+    const title = document.createElement('div');
+    title.className = 'name';
     title.textContent = script.name;
+
     const version = document.createElement('div');
     version.className = 'meta';
-    version.textContent = `v${script.version}`;
+    version.innerHTML = `v${script.version}<span class="badge">bundled</span>`;
+
     titleWrap.appendChild(title);
     titleWrap.appendChild(version);
 
+    const toggleWrap = document.createElement('label');
+    toggleWrap.className = 'switch';
     const toggle = document.createElement('input');
     toggle.type = 'checkbox';
     toggle.checked = script.enabled;
+    const slider = document.createElement('span');
+    slider.className = 'slider';
+    toggleWrap.appendChild(toggle);
+    toggleWrap.appendChild(slider);
 
     toggle.addEventListener('change', async () => {
       await chrome.runtime.sendMessage({
@@ -72,27 +98,24 @@ async function render() {
     });
 
     row.appendChild(titleWrap);
-    row.appendChild(toggle);
-
+    row.appendChild(toggleWrap);
     card.appendChild(row);
-    card.appendChild(makeStatusLine('matches this page', script.matchesPage));
+
+    const statusGrid = document.createElement('div');
+    statusGrid.className = 'status-grid';
+    statusGrid.appendChild(makeStatusCard('Matches this page', script.matchesPage));
 
     const runtime = runningMap[script.id] || {};
     const ran = !!runtime.ran;
-    card.appendChild(makeStatusLine('running/ran', ran));
+    statusGrid.appendChild(makeStatusCard('Running / ran', ran));
+    card.appendChild(statusGrid);
 
     if (runtime.error) {
-      const err = document.createElement('div');
-      err.className = 'hint';
-      err.textContent = `execution error: ${runtime.error}`;
-      card.appendChild(err);
+      card.appendChild(makeHint(`Execution error: ${runtime.error}`, 'error'));
     }
 
     if (!toggle.checked && ran) {
-      const hint = document.createElement('div');
-      hint.className = 'hint';
-      hint.textContent = 'Reload tab to fully disable effects.';
-      card.appendChild(hint);
+      card.appendChild(makeHint('Reload tab to fully disable effects.'));
     }
 
     list.appendChild(card);

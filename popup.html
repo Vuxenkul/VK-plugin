@@ -5,21 +5,195 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VK Userscript Runner</title>
     <style>
-      body { font-family: Arial, sans-serif; margin: 0; padding: 12px; width: 380px; }
-      h1 { font-size: 16px; margin: 0 0 10px; }
-      .script-card { border: 1px solid #ddd; border-radius: 6px; padding: 8px; margin-bottom: 8px; }
-      .row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
-      .meta { color: #666; font-size: 12px; }
-      .status { margin-top: 6px; font-size: 12px; }
-      .ok { color: #0a7a2f; }
-      .no { color: #9d2f2f; }
-      .hint { margin-top: 6px; color: #8a5a00; font-size: 12px; }
-      .empty { color: #666; font-size: 12px; }
+      :root {
+        --vk-yellow: #ffbe00;
+        --vk-cyan: #27b5c8;
+        --vk-cyan-deep: #1f95a5;
+        --vk-bg: #f7fbfc;
+        --vk-card: #ffffff;
+        --vk-text: #14313b;
+        --vk-muted: #5f7b83;
+        --vk-border: #d8e7ea;
+        --vk-danger: #b24343;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        width: 390px;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        background: linear-gradient(180deg, #ecf7f9 0%, var(--vk-bg) 120px);
+        color: var(--vk-text);
+      }
+
+      .shell {
+        padding: 14px;
+      }
+
+      .header {
+        border-radius: 14px;
+        background: linear-gradient(140deg, var(--vk-cyan) 0%, var(--vk-cyan-deep) 100%);
+        color: #fff;
+        padding: 14px;
+        box-shadow: 0 10px 24px rgba(31, 149, 165, 0.25);
+        margin-bottom: 12px;
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .header p {
+        margin: 6px 0 0;
+        font-size: 12px;
+        opacity: 0.95;
+      }
+
+      .script-card {
+        background: var(--vk-card);
+        border: 1px solid var(--vk-border);
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 10px;
+        box-shadow: 0 3px 14px rgba(39, 181, 200, 0.08);
+      }
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .name {
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.25;
+      }
+
+      .meta {
+        color: var(--vk-muted);
+        font-size: 12px;
+        margin-top: 3px;
+      }
+
+      .badge {
+        display: inline-block;
+        margin-left: 6px;
+        padding: 2px 7px;
+        border-radius: 999px;
+        font-size: 11px;
+        background: rgba(255, 190, 0, 0.18);
+        color: #8a6400;
+        border: 1px solid rgba(255, 190, 0, 0.45);
+      }
+
+      .switch {
+        position: relative;
+        width: 42px;
+        height: 24px;
+        flex-shrink: 0;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background: #c7d6da;
+        border-radius: 999px;
+        transition: all 0.18s ease;
+      }
+
+      .slider::before {
+        content: '';
+        position: absolute;
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        top: 3px;
+        border-radius: 999px;
+        background: #fff;
+        transition: all 0.18s ease;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      }
+
+      .switch input:checked + .slider {
+        background: var(--vk-cyan);
+      }
+
+      .switch input:checked + .slider::before {
+        transform: translateX(18px);
+      }
+
+      .status-grid {
+        margin-top: 9px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .status {
+        border-radius: 9px;
+        border: 1px solid var(--vk-border);
+        padding: 6px 8px;
+        font-size: 12px;
+        background: #f8fcfd;
+      }
+
+      .status .label {
+        color: var(--vk-muted);
+        display: block;
+      }
+
+      .status .value {
+        font-weight: 700;
+      }
+
+      .status.ok .value { color: #157949; }
+      .status.no .value { color: #9c4d00; }
+
+      .hint {
+        margin-top: 8px;
+        padding: 7px 9px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 190, 0, 0.45);
+        background: rgba(255, 190, 0, 0.14);
+        color: #7a5a00;
+        font-size: 12px;
+      }
+
+      .error {
+        border-color: rgba(178, 67, 67, 0.35);
+        background: rgba(178, 67, 67, 0.08);
+        color: var(--vk-danger);
+      }
+
+      .empty {
+        color: var(--vk-muted);
+        border: 1px dashed var(--vk-border);
+        border-radius: 12px;
+        padding: 14px;
+        text-align: center;
+        background: #fff;
+      }
     </style>
   </head>
   <body>
-    <h1>Bundled scripts</h1>
-    <div id="list" class="empty">Loading…</div>
+    <div class="shell">
+      <header class="header">
+        <h1>VK Userscript Runner</h1>
+        <p>Enable only the scripts you want for this page.</p>
+      </header>
+      <div id="list" class="empty">Loading…</div>
+    </div>
     <script src="popup.js"></script>
   </body>
 </html>
