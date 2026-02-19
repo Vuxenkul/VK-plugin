@@ -16,8 +16,7 @@ async function loadUserscriptMetadata(scriptDef) {
   const meta = parseUserscriptMetadata(raw);
   const full = {
     ...scriptDef,
-    ...meta,
-    code: raw
+    ...meta
   };
   metadataCache.set(scriptDef.id, full);
   return full;
@@ -94,33 +93,35 @@ async function getAllScripts() {
 }
 
 async function injectScript(tabId, script) {
+  const [state] = await chrome.scripting.executeScript({
+    target: { tabId },
+    func: (scriptId) => {
+      window.__VK_PLUGIN_RUNTIME = window.__VK_PLUGIN_RUNTIME || {};
+      return window.__VK_PLUGIN_RUNTIME[scriptId] || null;
+    },
+    args: [script.id]
+  });
+
+  if (state?.result?.ran) {
+    return;
+  }
+
   await chrome.scripting.executeScript({
     target: { tabId },
-    func: (source, scriptId) => {
+    files: [script.file]
+  });
+
+  await chrome.scripting.executeScript({
+    target: { tabId },
+    func: (scriptId) => {
       window.__VK_PLUGIN_RUNTIME = window.__VK_PLUGIN_RUNTIME || {};
-      const current = window.__VK_PLUGIN_RUNTIME[scriptId] || {};
-
-      if (current.ran) {
-        return;
-      }
-
-      try {
-        const runner = new Function(source);
-        runner();
-        window.__VK_PLUGIN_RUNTIME[scriptId] = {
-          ran: true,
-          error: null,
-          lastRunAt: Date.now()
-        };
-      } catch (err) {
-        window.__VK_PLUGIN_RUNTIME[scriptId] = {
-          ran: false,
-          error: String(err),
-          lastRunAt: Date.now()
-        };
-      }
+      window.__VK_PLUGIN_RUNTIME[scriptId] = {
+        ran: true,
+        error: null,
+        lastRunAt: Date.now()
+      };
     },
-    args: [script.code, script.id]
+    args: [script.id]
   });
 }
 
