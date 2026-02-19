@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VK Userscript Runner</title>
+    <style>
+      :root {
+        --vk-yellow: #ffbe00;
+        --vk-cyan: #27b5c8;
+        --bg: #f4f8f9;
+        --card: #fff;
+        --text: #11323a;
+        --muted: #678189;
+        --border: #d7e6ea;
+        --ok: #157949;
+        --warn: #9c4d00;
+        --error: #c43f3f;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        width: 360px;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      .wrap { padding: 12px; }
+      .head {
+        background: var(--vk-cyan);
+        color: #fff;
+        border-radius: 12px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+      }
+      .head h1 { margin: 0; font-size: 15px; }
+
+      .list-empty {
+        font-size: 12px;
+        color: var(--muted);
+        border: 1px dashed var(--border);
+        border-radius: 10px;
+        background: #fff;
+        padding: 12px;
+        text-align: center;
+      }
+
+      .item {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 8px;
+      }
+
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .name {
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.25;
+      }
+
+      .meta { font-size: 12px; color: var(--muted); }
+
+      .switch { position: relative; width: 40px; height: 22px; }
+      .switch input { opacity: 0; width: 0; height: 0; }
+      .slider {
+        position: absolute; inset: 0; cursor: pointer; border-radius: 999px;
+        background: #c4d4d8; transition: .18s ease;
+      }
+      .slider::before {
+        content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px;
+        border-radius: 50%; background: #fff; transition: .18s ease;
+      }
+      .switch input:checked + .slider { background: var(--vk-cyan); }
+      .switch input:checked + .slider::before { transform: translateX(18px); }
+
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 8px;
+        flex-wrap: wrap;
+      }
+
+      .chip {
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 2px 8px;
+        font-size: 11px;
+        background: #f8fcfd;
+      }
+      .chip b { font-weight: 700; }
+      .chip.ok b { color: var(--ok); }
+      .chip.no b { color: var(--warn); }
+
+      .match-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 4px;
+        background: var(--warn);
+      }
+      .match-dot.on { background: var(--ok); }
+
+      .error-row {
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--error);
+        font-size: 12px;
+      }
+      .error-icon {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+      }
+
+      .hint {
+        margin-top: 8px;
+        font-size: 11px;
+        color: #7a5a00;
+        background: rgba(255, 190, 0, .16);
+        border: 1px solid rgba(255, 190, 0, .45);
+        padding: 5px 7px;
+        border-radius: 8px;
+      }
+
+      .badge {
+        margin-left: 6px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 190, 0, .45);
+        background: rgba(255, 190, 0, .18);
+        color: #7d5b00;
+        padding: 1px 7px;
+        font-size: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="head"><h1>VK Userscript Runner</h1></div>
+      <div id="list" class="list-empty">Loading…</div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
