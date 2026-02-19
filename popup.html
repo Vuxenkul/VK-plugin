@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VK Userscript Runner</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 0; padding: 12px; width: 380px; }
+      h1 { font-size: 16px; margin: 0 0 10px; }
+      .script-card { border: 1px solid #ddd; border-radius: 6px; padding: 8px; margin-bottom: 8px; }
+      .row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+      .meta { color: #666; font-size: 12px; }
+      .status { margin-top: 6px; font-size: 12px; }
+      .ok { color: #0a7a2f; }
+      .no { color: #9d2f2f; }
+      .hint { margin-top: 6px; color: #8a5a00; font-size: 12px; }
+      .empty { color: #666; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1>Bundled scripts</h1>
+    <div id="list" class="empty">Loading…</div>
+    <script src="popup.js"></script>
+  </body>
+</html>

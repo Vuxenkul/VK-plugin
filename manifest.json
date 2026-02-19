@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "VK Userscript Runner",
+  "version": "1.0.0",
+  "description": "Loads bundled userscripts based on Tampermonkey-style metadata.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "scripting",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "https://vuxenkul.se/*"
+  ],
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "VK Userscript Runner"
+  }
+}
