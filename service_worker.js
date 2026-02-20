@@ -2,6 +2,10 @@ const BUNDLED_SCRIPTS = [
   {
     id: 'front-end-links',
     file: 'scripts/front-end-links.js'
+  },
+  {
+    id: 'backend-varugrupper',
+    file: 'scripts/backend-varugrupper.js'
   }
 ];
 

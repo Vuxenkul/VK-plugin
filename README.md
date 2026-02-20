@@ -1,7 +1,7 @@
 # VK Userscript Runner (Chrome Extension)
 
 A lightweight Manifest V3 Chrome extension that bundles one or more userscripts and runs them on matching pages.  
-This project currently ships with one userscript for `vuxenkul.se` that adds editor/admin helper links and copy tools on the public storefront.
+This project currently ships with two userscripts for `vuxenkul.se`: one for storefront editor/admin helper links, and one for backend category search/export improvements in butikadmin.
 
 ---
 
@@ -26,6 +26,7 @@ The extension has **three moving parts**:
 3. **Bundled userscript(s) (`scripts/*.js`)**
    - Regular JavaScript files with Tampermonkey-style metadata comments.
    - Example included: `scripts/front-end-links.js`.
+   - Also included: `scripts/backend-varugrupper.js`.
 
 ---
 
