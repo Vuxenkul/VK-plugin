@@ -37,9 +37,122 @@ function makeMaterialErrorIcon() {
   return svg;
 }
 
+function formatDateTime(timestamp) {
+  if (!timestamp) return 'Never';
+  try {
+    return new Date(timestamp).toLocaleString();
+  } catch (_err) {
+    return 'Unknown';
+  }
+}
+
+function renderUpdateBanner(update) {
+  const banner = document.getElementById('update-banner');
+  banner.innerHTML = '';
+  banner.className = '';
+
+  const currentVersion = update?.currentVersion || chrome.runtime.getManifest().version;
+  const latestVersion = update?.latestVersion || currentVersion;
+  const checkedText = `Last checked: ${formatDateTime(update?.checkedAt)}`;
+
+  if (update?.updateAvailable) {
+    banner.className = 'update-banner available';
+
+    const title = document.createElement('div');
+    title.className = 'update-title';
+    title.textContent = `Update available: v${latestVersion}`;
+
+    const info = document.createElement('div');
+    info.className = 'update-sub';
+    info.textContent = `Current: v${currentVersion}`;
+
+    banner.appendChild(title);
+    banner.appendChild(info);
+
+    if (update?.notes) {
+      const notes = document.createElement('div');
+      notes.className = 'update-sub';
+      notes.textContent = update.notes;
+      banner.appendChild(notes);
+    }
+
+    const actions = document.createElement('div');
+    actions.className = 'update-actions';
+
+    if (update.downloadUrl) {
+      const link = document.createElement('a');
+      link.className = 'update-btn';
+      link.href = update.downloadUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = 'Download update';
+      actions.appendChild(link);
+    } else {
+      const warn = document.createElement('div');
+      warn.className = 'update-sub';
+      warn.textContent = 'Download link missing. Contact admin.';
+      actions.appendChild(warn);
+    }
+
+    const refresh = document.createElement('button');
+    refresh.className = 'update-btn ghost';
+    refresh.type = 'button';
+    refresh.textContent = 'Check again';
+    refresh.addEventListener('click', async () => {
+      await checkForUpdates(true);
+    });
+    actions.appendChild(refresh);
+
+    banner.appendChild(actions);
+
+    const checked = document.createElement('div');
+    checked.className = 'update-sub tiny';
+    checked.textContent = checkedText;
+    banner.appendChild(checked);
+    return;
+  }
+
+  banner.className = 'update-banner none';
+
+  const title = document.createElement('div');
+  title.className = 'update-title';
+  title.textContent = `Up to date (v${currentVersion})`;
+  banner.appendChild(title);
+
+  if (update?.error) {
+    const err = document.createElement('div');
+    err.className = 'update-sub';
+    err.textContent = `Update check warning: ${update.error}`;
+    banner.appendChild(err);
+  }
+
+  const checked = document.createElement('div');
+  checked.className = 'update-sub tiny';
+  checked.textContent = checkedText;
+  banner.appendChild(checked);
+
+  const refresh = document.createElement('button');
+  refresh.className = 'update-btn ghost';
+  refresh.type = 'button';
+  refresh.textContent = 'Check again';
+  refresh.addEventListener('click', async () => {
+    await checkForUpdates(true);
+  });
+  banner.appendChild(refresh);
+}
+
+async function checkForUpdates(force = false) {
+  const response = await chrome.runtime.sendMessage({
+    type: force ? 'CHECK_FOR_UPDATES' : 'GET_UPDATE_STATUS'
+  });
+  renderUpdateBanner(response?.update || null);
+}
+
 async function render() {
   const list = document.getElementById('list');
   const tab = await getActiveTab();
+
+  await checkForUpdates(false);
 
   if (!tab || !tab.url || !/^https?:\/\//.test(tab.url)) {
     list.textContent = 'Open a website tab to evaluate scripts.';

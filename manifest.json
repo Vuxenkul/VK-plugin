@@ -10,7 +10,8 @@
     "webNavigation"
   ],
   "host_permissions": [
-    "https://vuxenkul.se/*"
+    "https://vuxenkul.se/*",
+    "https://wiki.vuxenkul.se/*"
   ],
   "background": {
     "service_worker": "service_worker.js"

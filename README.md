@@ -147,6 +147,38 @@ Potential popup messages:
 
 ---
 
+
+## Extension update notifications (wiki-hosted latest version)
+
+The extension now checks a remote JSON endpoint for the latest available extension version:
+
+- `https://wiki.vuxenkul.se/public/vk-plugin/latest.json`
+
+Expected JSON shape:
+
+```json
+{
+  "latestVersion": "1.0.1",
+  "downloadUrl": "https://wiki.vuxenkul.se/public/vk-plugin/VK-plugin-1.0.1.zip",
+  "notes": "Optional release notes"
+}
+```
+
+How it works:
+
+1. The background service worker compares `latestVersion` with the installed extension version from `manifest.json`.
+2. Popup shows either:
+   - **Up to date**, or
+   - **Update available** with a download button and release notes.
+3. Users manually download/install the new extension package.
+
+Important:
+
+- The updater checks metadata only; userscript execution still uses bundled files from `scripts/*.js`.
+- `downloadUrl` must point to `https://wiki.vuxenkul.se/...` (other hosts are ignored).
+
+---
+
 ## Add another bundled userscript
 
 1. Create a new script file in `scripts/`, with userscript metadata header.
@@ -185,7 +217,7 @@ At minimum include:
 
 ## Notes / limitations
 
-- This extension does **not** fetch scripts remotely; it only runs scripts packaged in this repo.
+- This extension fetches **version metadata only** from `https://wiki.vuxenkul.se/public/vk-plugin/latest.json` to notify about extension updates. Script code still runs from files packaged in this repo.
 - URL matching uses wildcard pattern conversion to regular expressions.
 - Disabling a script prevents future injections; previous DOM changes may remain until page reload.
 - Current setup is designed for Chromium-based browsers with Manifest V3 support.
