@@ -37,6 +37,58 @@
       }
       .head h1 { margin: 0; font-size: 15px; }
 
+      .update-banner {
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: #fff;
+        padding: 9px 10px;
+        margin-bottom: 10px;
+      }
+      .update-banner.available {
+        border-color: rgba(255, 190, 0, .55);
+        background: rgba(255, 190, 0, .12);
+      }
+      .update-banner.none {
+        border-color: rgba(39, 181, 200, .35);
+        background: rgba(39, 181, 200, .08);
+      }
+      .update-title {
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .update-sub {
+        margin-top: 4px;
+        font-size: 11px;
+        color: var(--muted);
+        line-height: 1.3;
+      }
+      .update-sub.tiny {
+        font-size: 10px;
+      }
+      .update-actions {
+        margin-top: 7px;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .update-btn {
+        border: 0;
+        border-radius: 7px;
+        font-size: 11px;
+        font-weight: 600;
+        text-decoration: none;
+        background: var(--vk-cyan);
+        color: #fff;
+        cursor: pointer;
+        padding: 5px 8px;
+      }
+      .update-btn.ghost {
+        border: 1px solid var(--border);
+        background: #fff;
+        color: var(--text);
+      }
+
       .list-empty {
         font-size: 12px;
         color: var(--muted);
@@ -150,6 +202,7 @@
   <body>
     <div class="wrap">
       <div class="head"><h1>VK Userscript Runner</h1></div>
+      <div id="update-banner" class="update-banner">Checking updates…</div>
       <div id="list" class="list-empty">Loading…</div>
     </div>
     <script src="popup.js"></script>

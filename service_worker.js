@@ -5,6 +5,10 @@ const BUNDLED_SCRIPTS = [
   }
 ];
 
+const UPDATE_MANIFEST_URL = 'https://wiki.vuxenkul.se/public/vk-plugin/latest.json';
+const UPDATE_STATE_KEY = 'updateState';
+const UPDATE_CHECK_MIN_INTERVAL_MS = 60 * 60 * 1000;
+
 const metadataCache = new Map();
 
 async function loadUserscriptMetadata(scriptDef) {
@@ -70,6 +74,124 @@ function scriptMatches(script, url) {
   if (!matchesUrl(url, script.matches)) return false;
   if (script.excludes.length && matchesUrl(url, script.excludes)) return false;
   return true;
+}
+
+function normalizeVersion(version) {
+  return String(version || '')
+    .trim()
+    .replace(/^v/i, '');
+}
+
+function compareVersions(a, b) {
+  const cleanA = normalizeVersion(a);
+  const cleanB = normalizeVersion(b);
+
+  if (!cleanA && !cleanB) return 0;
+  if (!cleanA) return -1;
+  if (!cleanB) return 1;
+
+  const aParts = cleanA.split('.').map((part) => Number.parseInt(part, 10) || 0);
+  const bParts = cleanB.split('.').map((part) => Number.parseInt(part, 10) || 0);
+  const max = Math.max(aParts.length, bParts.length);
+
+  for (let i = 0; i < max; i += 1) {
+    const left = aParts[i] || 0;
+    const right = bParts[i] || 0;
+    if (left > right) return 1;
+    if (left < right) return -1;
+  }
+
+  return 0;
+}
+
+function buildDefaultUpdateState() {
+  return {
+    checkedAt: null,
+    updateAvailable: false,
+    currentVersion: chrome.runtime.getManifest().version,
+    latestVersion: null,
+    downloadUrl: null,
+    notes: null,
+    error: null
+  };
+}
+
+async function getUpdateState() {
+  const stored = await chrome.storage.local.get(UPDATE_STATE_KEY);
+  return {
+    ...buildDefaultUpdateState(),
+    ...(stored[UPDATE_STATE_KEY] || {})
+  };
+}
+
+async function setUpdateState(state) {
+  await chrome.storage.local.set({ [UPDATE_STATE_KEY]: state });
+}
+
+function sanitizeDownloadUrl(url) {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:') return null;
+    if (parsed.hostname !== 'wiki.vuxenkul.se') return null;
+    return parsed.toString();
+  } catch (_err) {
+    return null;
+  }
+}
+
+function sanitizeManifestPayload(payload) {
+  const latestVersion = normalizeVersion(payload?.latestVersion);
+  const downloadUrl = sanitizeDownloadUrl(payload?.downloadUrl);
+  const notes = typeof payload?.notes === 'string' ? payload.notes.trim() : null;
+  return { latestVersion, downloadUrl, notes };
+}
+
+async function checkForExtensionUpdate({ force = false } = {}) {
+  const now = Date.now();
+  const previous = await getUpdateState();
+
+  if (!force && previous.checkedAt && now - previous.checkedAt < UPDATE_CHECK_MIN_INTERVAL_MS) {
+    return previous;
+  }
+
+  const currentVersion = chrome.runtime.getManifest().version;
+
+  try {
+    const response = await fetch(UPDATE_MANIFEST_URL, { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const payload = await response.json();
+    const parsed = sanitizeManifestPayload(payload);
+    if (!parsed.latestVersion) {
+      throw new Error('Missing latestVersion in update manifest');
+    }
+
+    const updateAvailable = compareVersions(parsed.latestVersion, currentVersion) > 0;
+    const state = {
+      checkedAt: now,
+      updateAvailable,
+      currentVersion,
+      latestVersion: parsed.latestVersion,
+      downloadUrl: parsed.downloadUrl,
+      notes: parsed.notes,
+      error: parsed.downloadUrl ? null : 'Invalid or missing downloadUrl in update manifest'
+    };
+
+    await setUpdateState(state);
+    return state;
+  } catch (err) {
+    const state = {
+      ...previous,
+      checkedAt: now,
+      currentVersion,
+      error: String(err)
+    };
+    await setUpdateState(state);
+    return state;
+  }
 }
 
 async function getEnabledMap() {
@@ -157,6 +279,14 @@ async function handleTab(tabId) {
   await evaluateAndInjectForTab(tabId, tab.url);
 }
 
+chrome.runtime.onInstalled.addListener(() => {
+  checkForExtensionUpdate({ force: true });
+});
+
+chrome.runtime.onStartup.addListener(() => {
+  checkForExtensionUpdate();
+});
+
 chrome.webNavigation.onCommitted.addListener(async (details) => {
   if (details.frameId !== 0) return;
   await evaluateAndInjectForTab(details.tabId, details.url);
@@ -189,6 +319,18 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         await handleTab(message.tabId);
       }
       sendResponse({ ok: true });
+      return;
+    }
+
+    if (message?.type === 'GET_UPDATE_STATUS') {
+      const state = await checkForExtensionUpdate();
+      sendResponse({ update: state });
+      return;
+    }
+
+    if (message?.type === 'CHECK_FOR_UPDATES') {
+      const state = await checkForExtensionUpdate({ force: true });
+      sendResponse({ update: state });
       return;
     }
 
