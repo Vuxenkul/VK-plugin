@@ -10,6 +10,10 @@ const BUNDLED_SCRIPTS = [
   {
     id: 'backend-top_n_side-bar',
     file: 'scripts/backend-top_n_side-bar.user.js'
+  },
+  {
+    id: 'backend-edit_product',
+    file: 'scripts/backend-edit_product.user.js'
   }
 ];
 
