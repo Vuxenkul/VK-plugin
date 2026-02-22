@@ -1,14 +1,8 @@
 // ==UserScript==
 // @name         Backend Hantera Produkter – Zoombara bilder i listor och hantera produkter.
-// @namespace    http://tampermonkey.net/
 // @version      1.0
-// @description  Zoombara bilder i listor och hantera produkter. Lägger även till bilder under filter för lättare översikt
-// @author       You
 // @match        https://vuxenkul.se/butikadmin/products.php*
 // @match        https://vuxenkul.se/butikadmin/products_multiedit.php*
-// @updateURL    https://wiki.vuxenkul.se/public/tampermonkey/backend-images.user.js
-// @downloadURL  https://wiki.vuxenkul.se/public/tampermonkey/backend-images.user.js
-// @grant        none
 // ==/UserScript==
 
 (function () {

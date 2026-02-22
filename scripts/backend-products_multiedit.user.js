@@ -1,13 +1,7 @@
 // ==UserScript==
 // @name         Admin hantera produkter – Kopiera (Art.nr, Namn, Antal, Edit-länk, Webb-länk)
-// @namespace    https://vuxenkul.se/
 // @version      1.0
-// @description  Kopiera/Ladda ner produkter, välj om variant (.product-list-same) ska tas med
 // @match        https://vuxenkul.se/butikadmin/products_multiedit.php*
-// @grant        GM_registerMenuCommand
-// @run-at       document-end
-// @updateURL    https://wiki.vuxenkul.se/public/tampermonkey/backend-products_multiedit.user.js
-// @downloadURL  https://wiki.vuxenkul.se/public/tampermonkey/backend-products_multiedit.user.js
 // ==/UserScript==
 
 (function () {

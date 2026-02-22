@@ -1,13 +1,7 @@
 // ==UserScript==
 // @name         Backend Produkter - Dölj EN/ES Kort & långbeskrivning
-// @namespace    http://tampermonkey.net/
 // @version      1.0
-// @description  Show only Swedish language field, add flags and toggle buttons without hiding section labels
-// @author       You
-// @updateURL    https://wiki.vuxenkul.se/public/tampermonkey/backend-products-language-filters.user.js
-// @downloadURL  https://wiki.vuxenkul.se/public/tampermonkey/backend-products-language-filters.user.js
 // @match        https://vuxenkul.se/butikadmin/products.php*
-// @grant        none
 // ==/UserScript==
 
 (function () {
