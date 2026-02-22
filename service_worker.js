@@ -14,6 +14,10 @@ const BUNDLED_SCRIPTS = [
   {
     id: 'backend-edit_product',
     file: 'scripts/backend-edit_product.user.js'
+  },
+  {
+    id: 'backend-products-language-filters',
+    file: 'scripts/backend-products-language-filters.user.js'
   }
 ];
 
