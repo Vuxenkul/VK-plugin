@@ -1,14 +1,9 @@
 // ==UserScript==
 // @name         Front-end - Länkar backend / Kopiera varor
-// @namespace    http://tampermonkey.net/
 // @version      1.3
-// @description  Lägger till länkar i produkter & varugrupper direkt till back-end. Tillåter att kopiera URLer (Front-end, Back-end) och Bild-URLer direkt från varugruppssidan. Om ingen .grid-gallery finns, visas Metatitel & Meta description med teckenräkning överst på sidan.
 // @match        https://vuxenkul.se/*
-// @grant        none
 // @exclude      https://vuxenkul.se/
 // @exclude      https://vuxenkul.se/butikadmin/*
-// @updateURL    https://wiki.vuxenkul.se/public/tampermonkey/front-end.user.js
-// @downloadURL  https://wiki.vuxenkul.se/public/tampermonkey/front-end.user.js
 // ==/UserScript==
 
 (function () {

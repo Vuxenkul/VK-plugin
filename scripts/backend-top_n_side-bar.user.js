@@ -1,13 +1,7 @@
 // ==UserScript==
 // @name         Backend –  Topbar sökfunktion +  Vuxenkul Wiki länk
-// @namespace    http://tampermonkey.net/
 // @version      1.0
-// @description  Adds a search box after visitor count in the top bar (submenu search only) and a styled Vuxenkul Wiki link before Kontrollpanelen.
 // @match        https://vuxenkul.se/butikadmin/*
-// @grant        none
-// @run-at       document-end
-// @updateURL   https://wiki.vuxenkul.se/public/tampermonkey/backend-top_n_side-bar.user.js
-// @downloadURL https://wiki.vuxenkul.se/public/tampermonkey/backend-top_n_side-bar.user.js
 // ==/UserScript==
 
 (function () {

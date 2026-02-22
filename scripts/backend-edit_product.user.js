@@ -1,13 +1,7 @@
 // ==UserScript==
 // @name         Backend Produkter - UI förbättringar för produktsidan med kollapsade filterboxar
-// @namespace    http://tampermonkey.net/
 // @version      1.0
-// @description  UI förbättringar för produktsidan med kollapsade filterboxar
 // @match        https://vuxenkul.se/butikadmin/products.php*
-// @grant        none
-// @updateURL    https://wiki.vuxenkul.se/public/tampermonkey/backend-edit_product.user.js
-// @downloadURL  https://wiki.vuxenkul.se/public/tampermonkey/backend-edit_product.user.js
-// @run-at       document-end
 // ==/UserScript==
 
 (function () {

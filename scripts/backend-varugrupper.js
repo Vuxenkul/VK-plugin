@@ -1,13 +1,7 @@
 // ==UserScript==
 // @name        Admin Varugrupper – Sök och kopiera URLer (+ UI-förbättringar)
-// @namespace   http://tampermonkey.net/
 // @version      1.0
-// @description Sök efter varugrupp och kopiering som TSV (Varugrupp | Back-end | Front-end). "(Dyn)" läggs till för dynamiska varugrupper. Färgkodad hierarki + förbättrad statuskolumn.
 // @match       https://vuxenkul.se/butikadmin/categories.php
-// @grant       none
-// @updateURL   https://wiki.vuxenkul.se/public/tampermonkey/backend-varugrupper.user.js
-// @downloadURL https://wiki.vuxenkul.se/public/tampermonkey/backend-varugrupper.user.js
-// @run-at      document-end
 // ==/UserScript==
 
 (function () {

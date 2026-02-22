@@ -1,12 +1,7 @@
 // ==UserScript==
 // @name         Backend Filter - Funktion med filtersök och filterregler
-// @namespace    http://tampermonkey.net/
 // @version      1.0
-// @description  Visar valda filter, varningar och en fast sökruta (med Exact-match). Fixar “20 cm”-krockarna och lägger till DVD/Porrfilm-logik.
 // @match        https://vuxenkul.se/butikadmin/products.php*
-// @grant        none
-// @updateURL    https://wiki.vuxenkul.se/public/tampermonkey/backend-conditional-filters.user.js
-// @downloadURL  https://wiki.vuxenkul.se/public/tampermonkey/backend-conditional-filters.user.js
 // ==/UserScript==
 
 (function () {
