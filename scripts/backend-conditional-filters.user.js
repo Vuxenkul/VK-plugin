@@ -99,7 +99,7 @@
     /* ---------- 3) Sökbox ---------- */
     const searchBoxHTML = `
         <input type="text" id="tm-search" placeholder="🔍 Sök filter / kategori" style="width:80%;padding:8px;">
-        <label style="margin-left:10px;"><input type="checkbox" id="tm-exact"> Exact Match</label>
+        <label style="margin-left:10px;"><input type="checkbox" id="tm-exact"> Exakt matchning</label>
         <div id="tm-results" style="border:1px solid #ccc;max-height:200px;overflow-y:auto;display:none;padding:5px;background:#fff;"></div>
     `;
     const searchWrap = document.createElement('div');

@@ -49,7 +49,7 @@ async function loadUserscriptMetadata(scriptDef) {
 function parseUserscriptMetadata(source) {
   const match = source.match(/\/\/ ==UserScript==([\s\S]*?)\/\/ ==\/UserScript==/);
   const metadata = {
-    name: 'Unnamed script',
+    name: 'Namnlöst skript',
     version: '0.0.0',
     matches: [],
     excludes: []
@@ -186,7 +186,7 @@ async function checkForExtensionUpdate({ force = false } = {}) {
     const payload = await response.json();
     const parsed = sanitizeManifestPayload(payload);
     if (!parsed.latestVersion) {
-      throw new Error('Missing latestVersion in update manifest');
+      throw new Error('Saknar latestVersion i uppdateringsmanifestet');
     }
 
     const updateAvailable = compareVersions(parsed.latestVersion, currentVersion) > 0;
@@ -197,7 +197,7 @@ async function checkForExtensionUpdate({ force = false } = {}) {
       latestVersion: parsed.latestVersion,
       downloadUrl: parsed.downloadUrl,
       notes: parsed.notes,
-      error: parsed.downloadUrl ? null : 'Invalid or missing downloadUrl in update manifest'
+      error: parsed.downloadUrl ? null : 'Ogiltig eller saknad downloadUrl i uppdateringsmanifestet'
     };
 
     await setUpdateState(state);
