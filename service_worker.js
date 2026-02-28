@@ -1,27 +1,33 @@
 const BUNDLED_SCRIPTS = [
   {
     id: 'front-end-links',
-    file: 'scripts/front-end-links.js'
+    file: 'scripts/front-end-links.js',
+    fallbackDescription: 'Lägger till snabblänkar till admin och verktyg för att kopiera synliga produkter från butikssidan.'
   },
   {
     id: 'backend-varugrupper',
-    file: 'scripts/backend-varugrupper.js'
+    file: 'scripts/backend-varugrupper.js',
+    fallbackDescription: 'Förbättrar kategorisidan med sök, breadcrumb-lista och kopiering/export av kategorilänkar.'
   },
   {
     id: 'backend-top_n_side-bar',
-    file: 'scripts/backend-top_n_side-bar.user.js'
+    file: 'scripts/backend-top_n_side-bar.user.js',
+    fallbackDescription: 'Lägger till global adminsök i topbaren och en snabbgenväg till Vuxenkul Wiki.'
   },
   {
     id: 'backend-edit_product',
-    file: 'scripts/backend-edit_product.user.js'
+    file: 'scripts/backend-edit_product.user.js',
+    fallbackDescription: 'Förbättrar produktsidan med tydligare layout och kollapsbara filtersektioner.'
   },
   {
     id: 'backend-products-language-filters',
-    file: 'scripts/backend-products-language-filters.user.js'
+    file: 'scripts/backend-products-language-filters.user.js',
+    fallbackDescription: 'Lägger till språkfilter för beskrivningsfält så rätt språk kan redigeras snabbare.'
   },
   {
     id: 'backend-images',
-    file: 'scripts/backend-images.user.js'
+    file: 'scripts/backend-images.user.js',
+    fallbackDescription: 'Gör produktbilder klickbara med zoom/lightbox i products.php och products_multiedit.php.'
   }
 ];
 
@@ -37,7 +43,7 @@ async function loadUserscriptMetadata(scriptDef) {
   }
 
   const raw = await fetch(chrome.runtime.getURL(scriptDef.file)).then((r) => r.text());
-  const meta = parseUserscriptMetadata(raw);
+  const meta = parseUserscriptMetadata(raw, scriptDef);
   const full = {
     ...scriptDef,
     ...meta
@@ -46,11 +52,12 @@ async function loadUserscriptMetadata(scriptDef) {
   return full;
 }
 
-function parseUserscriptMetadata(source) {
+function parseUserscriptMetadata(source, scriptDef = {}) {
   const match = source.match(/\/\/ ==UserScript==([\s\S]*?)\/\/ ==\/UserScript==/);
   const metadata = {
     name: 'Namnlöst skript',
     version: '0.0.0',
+    description: scriptDef.fallbackDescription || 'Beskrivning saknas i skriptmetadata.',
     matches: [],
     excludes: []
   };
@@ -66,6 +73,7 @@ function parseUserscriptMetadata(source) {
     const [, tag, value] = tagMatch;
     if (tag === 'name') metadata.name = value.trim();
     if (tag === 'version') metadata.version = value.trim();
+    if (tag === 'description') metadata.description = value.trim();
     if (tag === 'match') metadata.matches.push(value.trim());
     if (tag === 'exclude') metadata.excludes.push(value.trim());
   }
@@ -326,6 +334,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         id: s.id,
         name: s.name,
         version: s.version,
+        description: s.description,
         matchesPage: scriptMatches(s, message.url),
         enabled: enabledMap[s.id] !== false
       }));

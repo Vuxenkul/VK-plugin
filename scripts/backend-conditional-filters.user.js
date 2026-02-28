@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name         Backend Filter - Funktion med filtersök och filterregler
+// @name         Backend produkter – Filtervalidering med regelkontroll och varningslista
+// @description  Analyserar valda produktfilter i products.php, grupperar dem per kategori och visar varningar när obligatoriska filter saknas eller när villkorade regler inte uppfylls (t.ex. kläder, sexleksaker, kondomer och DVD).
 // @version      1.0
 // @match        https://vuxenkul.se/butikadmin/products.php*
 // ==/UserScript==

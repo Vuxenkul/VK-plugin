@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name         Backend Produkter - Dölj EN/ES Kort & långbeskrivning
+// @name         Backend produkter – Språkfilter för kort- och långbeskrivning (SV/EN/ES)
+// @description  Lägger till språkväxling i produktformuläret så att fält för kort/lång beskrivning kan filtreras per språk. Visar språkflaggor och gör det enklare att fokusera på rätt översättning.
 // @version      1.0
 // @match        https://vuxenkul.se/butikadmin/products.php*
 // ==/UserScript==
