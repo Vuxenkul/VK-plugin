@@ -173,25 +173,46 @@
         const catId = match[1];
 
         const h1 = document.querySelector('h1.category-heading[itemprop="headline"]');
-        if (!h1 || h1.nextElementSibling?.classList.contains('admin-edit-category')) return;
+        if (!h1 || h1.nextElementSibling?.classList.contains('admin-category-tools')) return;
 
-        const link = document.createElement('a');
-        link.href   = `https://vuxenkul.se/butikadmin/categories.php?action=edit&id=${catId}`;
-        link.textContent = `✏️ Redigera kategori (${catId})`;
-        link.target = '_blank';
-        link.className = 'admin-edit-category';
-        link.style = `
-            display:inline-block;
-            margin:4px 0 12px;
-            font-size:13px;
-            padding:3px 8px;
-            background:#ff4081;
-            color:#fff;
-            border-radius:3px;
-            font-weight:bold;
-            text-decoration:none;
-        `;
-        h1.parentNode.insertBefore(link, h1.nextSibling);
+        const tools = document.createElement('div');
+        tools.className = 'admin-category-tools';
+        tools.style = 'display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px;';
+
+        const editLink = document.createElement('a');
+        editLink.href   = `https://vuxenkul.se/butikadmin/categories.php?action=edit&id=${catId}`;
+        editLink.textContent = `✏️ Redigera kategori (${catId})`;
+        editLink.target = '_blank';
+        editLink.className = 'admin-edit-category';
+        editLink.style = pillStyle;
+        tools.appendChild(editLink);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.textContent = '📋 Kopiera kategoritext';
+        copyBtn.style = `${pillStyle};border:0;`;
+        copyBtn.addEventListener('click', () => {
+            const categoryHeading = document.querySelector('.category-heading')?.textContent?.trim() || '';
+            const categoryLead = document.querySelector('.category-lead')?.textContent?.trim() || '';
+            const categorySecondary = document.querySelector('.category-secondary')?.textContent?.trim() || '';
+
+            const payload = [categoryHeading, categoryLead, categorySecondary].join('\n\n').trim();
+            if (!payload) {
+                alert('Hittade ingen kategoritext att kopiera.');
+                return;
+            }
+
+            navigator.clipboard.writeText(payload)
+                .then(() => {
+                    const prev = copyBtn.textContent;
+                    copyBtn.textContent = '✅ Kategoritext kopierad';
+                    setTimeout(() => { copyBtn.textContent = prev; }, 1500);
+                })
+                .catch(err => alert('Kunde inte kopiera: ' + err));
+        });
+        tools.appendChild(copyBtn);
+
+        h1.parentNode.insertBefore(tools, h1.nextSibling);
     }
 
     /* ═══════════ 6. Init & Observer ═══════════ */
