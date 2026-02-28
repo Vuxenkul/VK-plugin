@@ -38,6 +38,27 @@
       }
       .head h1 { margin: 0; font-size: 15px; }
 
+      .quicklinks {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+      .quicklink {
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 4px 8px;
+        background: #fff;
+        color: var(--text);
+        font-size: 11px;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .quicklink:hover {
+        border-color: var(--vk-cyan);
+        color: var(--vk-cyan);
+      }
+
       .update-banner {
         border-radius: 10px;
         border: 1px solid var(--border);
@@ -203,6 +224,13 @@
   <body>
     <div class="wrap">
       <div class="head"><h1>VK Userscript Runner</h1></div>
+      <div class="quicklinks">
+        <a class="quicklink" href="https://vuxenkul.se" target="_blank" rel="noopener noreferrer">Vuxenkul.se</a>
+        <a class="quicklink" href="https://vuxenkul.se/butikadmin/controls.php" target="_blank" rel="noopener noreferrer">Vuxenkul Admin</a>
+        <a class="quicklink" href="https://kkompis.se" target="_blank" rel="noopener noreferrer">KKompis.se</a>
+        <a class="quicklink" href="https://app.ahrefs.com/user/login" target="_blank" rel="noopener noreferrer">Ahrefs</a>
+        <a class="quicklink" href="https://app.getanewsletter.com/signin" target="_blank" rel="noopener noreferrer">Newsletter</a>
+      </div>
       <div id="update-banner" class="update-banner">Checking updates…</div>
       <div id="list" class="list-empty">Loading…</div>
     </div>
