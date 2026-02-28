@@ -20,6 +20,14 @@ const BUNDLED_SCRIPTS = [
     file: 'scripts/backend-products-language-filters.user.js'
   },
   {
+    id: 'backend-products_multiedit',
+    file: 'scripts/backend-products_multiedit.user.js'
+  },
+  {
+    id: 'backend-conditional-filters',
+    file: 'scripts/backend-conditional-filters.user.js'
+  },
+  {
     id: 'backend-images',
     file: 'scripts/backend-images.user.js'
   }
