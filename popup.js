@@ -51,7 +51,7 @@ function makeDescriptionTooltip(description) {
 
   const tip = document.createElement('span');
   tip.className = 'tooltip';
-  tip.textContent = description || 'Ingen beskrivning tillgänglig.';
+  tip.textContent = description || 'Beskrivning saknas i skriptmetadata.';
 
   wrap.appendChild(button);
   wrap.appendChild(tip);
