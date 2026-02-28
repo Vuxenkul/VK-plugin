@@ -1,7 +1,8 @@
 // ==UserScript==
-// @name        Admin Varugrupper – Sök och kopiera URLer (+ UI-förbättringar)
+// @name         Backend kategorier – Kategorisök, breadcrumb-kopiering och snabbgenvägar
+// @description  Förbättrar sidan för varugrupper/kategorier med sökfält, träfflista, kopiering av kategorier som TSV med breadcrumb, samt knappar för att snabbt öppna edit- och visningslänkar.
 // @version      1.0
-// @match       https://vuxenkul.se/butikadmin/categories.php
+// @match        https://vuxenkul.se/butikadmin/categories.php
 // ==/UserScript==
 
 (function () {

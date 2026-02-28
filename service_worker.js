@@ -51,6 +51,7 @@ function parseUserscriptMetadata(source) {
   const metadata = {
     name: 'Namnlöst skript',
     version: '0.0.0',
+    description: 'Ingen beskrivning tillgänglig.',
     matches: [],
     excludes: []
   };
@@ -66,6 +67,7 @@ function parseUserscriptMetadata(source) {
     const [, tag, value] = tagMatch;
     if (tag === 'name') metadata.name = value.trim();
     if (tag === 'version') metadata.version = value.trim();
+    if (tag === 'description') metadata.description = value.trim();
     if (tag === 'match') metadata.matches.push(value.trim());
     if (tag === 'exclude') metadata.excludes.push(value.trim());
   }
@@ -326,6 +328,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         id: s.id,
         name: s.name,
         version: s.version,
+        description: s.description,
         matchesPage: scriptMatches(s, message.url),
         enabled: enabledMap[s.id] !== false
       }));

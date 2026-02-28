@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name         Backend –  Topbar sökfunktion +  Vuxenkul Wiki länk
+// @name         Backend admin – Global sökruta i topbar + snabblänk till Wiki
+// @description  Lägger till en central sökruta i adminens topbar för snabb navigering mellan sidor/funktioner samt en tydlig direktlänk till Vuxenkul Wiki för dokumentation och rutiner.
 // @version      1.0
 // @match        https://vuxenkul.se/butikadmin/*
 // ==/UserScript==

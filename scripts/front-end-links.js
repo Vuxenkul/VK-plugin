@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name         Front-end - Länkar backend / Kopiera varor
+// @name         Frontend butikssida – Snabblänkar till admin + kopiera synliga produkter
+// @description  Lägger till en verktygsrad på publika produktsidor med snabbknappar för att öppna varan i admin, visa alla varor och kopiera URL + bildlänk för synliga produkter. Visar även produkt-ID och snabbåtkomst till backend från produktdetaljsidor.
 // @version      1.5
 // @match        https://vuxenkul.se/*
 // @exclude      https://vuxenkul.se/

@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name         Admin hantera produkter – Kopiera (Art.nr, Namn, Antal, Edit-länk, Webb-länk)
+// @name         Backend multiedit – Exportera produktdata till urklipp (TSV)
+// @description  Lägger till exportverktyg på products_multiedit.php för att kopiera markerade/visade produkter med artikelnummer, namn, lagerantal, edit-länk och webblänk till ett kalkylbladsvänligt format.
 // @version      1.0
 // @match        https://vuxenkul.se/butikadmin/products_multiedit.php*
 // ==/UserScript==

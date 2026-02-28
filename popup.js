@@ -37,6 +37,27 @@ function makeMaterialErrorIcon() {
   return svg;
 }
 
+
+function makeDescriptionTooltip(description) {
+  const wrap = document.createElement('span');
+  wrap.className = 'info-wrap';
+
+  const button = document.createElement('span');
+  button.className = 'info-icon';
+  button.textContent = '?';
+  button.tabIndex = 0;
+  button.setAttribute('role', 'button');
+  button.setAttribute('aria-label', 'Visa beskrivning av skript');
+
+  const tip = document.createElement('span');
+  tip.className = 'tooltip';
+  tip.textContent = description || 'Ingen beskrivning tillgänglig.';
+
+  wrap.appendChild(button);
+  wrap.appendChild(tip);
+  return wrap;
+}
+
 function formatDateTime(timestamp) {
   if (!timestamp) return 'Aldrig';
   try {
@@ -182,7 +203,11 @@ async function render() {
     const left = document.createElement('div');
     const title = document.createElement('div');
     title.className = 'name';
-    title.textContent = script.name;
+
+    const titleText = document.createElement('span');
+    titleText.textContent = script.name;
+    title.appendChild(titleText);
+    title.appendChild(makeDescriptionTooltip(script.description));
 
     const meta = document.createElement('div');
     meta.className = 'meta';
