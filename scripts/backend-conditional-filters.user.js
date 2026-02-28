@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Backend Filter - Funktion med filtersök och filterregler
+// @name         Backend Produkter - Filterregler + filtersök
 // @version      1.0
 // @match        https://vuxenkul.se/butikadmin/products.php*
 // ==/UserScript==

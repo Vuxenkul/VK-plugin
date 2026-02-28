@@ -44,14 +44,36 @@ async function loadUserscriptMetadata(scriptDef) {
     return metadataCache.get(scriptDef.id);
   }
 
-  const raw = await fetch(chrome.runtime.getURL(scriptDef.file)).then((r) => r.text());
-  const meta = parseUserscriptMetadata(raw);
-  const full = {
+  const fallback = {
     ...scriptDef,
-    ...meta
+    name: scriptDef.id,
+    version: '0.0.0',
+    matches: [],
+    excludes: [],
+    loadError: null
   };
-  metadataCache.set(scriptDef.id, full);
-  return full;
+
+  try {
+    const response = await fetch(chrome.runtime.getURL(scriptDef.file));
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const raw = await response.text();
+    const meta = parseUserscriptMetadata(raw);
+    const full = {
+      ...fallback,
+      ...meta
+    };
+    metadataCache.set(scriptDef.id, full);
+    return full;
+  } catch (err) {
+    const full = {
+      ...fallback,
+      loadError: String(err)
+    };
+    metadataCache.set(scriptDef.id, full);
+    return full;
+  }
 }
 
 function parseUserscriptMetadata(source) {
