@@ -7,6 +7,8 @@
 (function () {
     'use strict';
 
+    let initialized = false;
+
     /* ---------- 0) Hjälp ---------- */
     const cleanCat = t => t.replace(/[🢂►→:]/g, '').trim();
     const getArtNo = () => (document.getElementById('article-number')?.value || '').trim().toUpperCase();
@@ -102,20 +104,12 @@
         <label style="margin-left:10px;"><input type="checkbox" id="tm-exact"> Exakt matchning</label>
         <div id="tm-results" style="border:1px solid #ccc;max-height:200px;overflow-y:auto;display:none;padding:5px;background:#fff;"></div>
     `;
-    const searchWrap = document.createElement('div');
-    searchWrap.id='tampermonkey-search-container';
-    searchWrap.style.marginTop='10px';
-    searchWrap.innerHTML = searchBoxHTML;
-    document.querySelector('.filters-all')?.after(searchWrap);
-
-    const qInput  = document.getElementById('tm-search');
-    const qExact  = document.getElementById('tm-exact');
-    const qResBox = document.getElementById('tm-results');
-
-    qInput.addEventListener('input',()=>runSearch());
-    qExact.addEventListener('change',()=>runSearch());
+    let qInput;
+    let qExact;
+    let qResBox;
 
     function runSearch(){
+        if (!qInput || !qExact || !qResBox) return;
         const term = qInput.value.trim().toLowerCase();
         const exact= qExact.checked;
         qResBox.innerHTML=''; qResBox.style.display=term?'block':'none';
@@ -163,10 +157,44 @@
     }
 
     /* ---------- 4) Initialisering & events ---------- */
-    buildSummary();
-    document.addEventListener('change',e=>{
-        if(e.target.matches('input[name="filteritems[]"]')) buildSummary();
-    });
-    document.getElementById('article-number')?.addEventListener('input',()=>{runSearch(); buildSummary();});
+    function init() {
+        if (initialized) return;
+
+        const filterContainer = document.querySelector('.filters-all');
+        if (!filterContainer) return;
+
+        initialized = true;
+
+        const searchWrap = document.createElement('div');
+        searchWrap.id='tampermonkey-search-container';
+        searchWrap.style.marginTop='10px';
+        searchWrap.innerHTML = searchBoxHTML;
+        filterContainer.after(searchWrap);
+
+        qInput  = document.getElementById('tm-search');
+        qExact  = document.getElementById('tm-exact');
+        qResBox = document.getElementById('tm-results');
+
+        qInput?.addEventListener('input',()=>runSearch());
+        qExact?.addEventListener('change',()=>runSearch());
+
+        buildSummary();
+
+        document.addEventListener('change',e=>{
+            if(e.target.matches('input[name="filteritems[]"]')) buildSummary();
+        });
+        document.getElementById('article-number')?.addEventListener('input',()=>{runSearch(); buildSummary();});
+    }
+
+    init();
+    if (!initialized) {
+        window.addEventListener('load', init, { once: true });
+
+        const observer = new MutationObserver(() => {
+            init();
+            if (initialized) observer.disconnect();
+        });
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+    }
 
 })();
