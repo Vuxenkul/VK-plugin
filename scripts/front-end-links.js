@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Front-end - Länkar backend / Kopiera varor
-// @version      1.3
+// @version      1.5
 // @match        https://vuxenkul.se/*
 // @exclude      https://vuxenkul.se/
 // @exclude      https://vuxenkul.se/butikadmin/*
@@ -182,6 +182,57 @@
             .join('\n');
     }
 
+    function normalizeHttpUrl(rawUrl) {
+        if (!rawUrl) return '';
+        const trimmed = rawUrl.trim();
+        if (!trimmed) return '';
+
+        try {
+            const url = new URL(trimmed, location.origin);
+            return (url.protocol === 'http:' || url.protocol === 'https:') ? url.href : '';
+        } catch {
+            return '';
+        }
+    }
+
+    function collectCategoryLinks(selectors) {
+        const linkMap = new Map();
+        const textUrlRegex = /(https?:\/\/[^\s<>")']+)/gi;
+
+        const addLink = (url, source, type) => {
+            const normalized = normalizeHttpUrl(url);
+            if (!normalized || linkMap.has(normalized)) return;
+            linkMap.set(normalized, { source, type, url: normalized });
+        };
+
+        selectors.forEach(selector => {
+            const container = document.querySelector(selector);
+            if (!container) return;
+
+            // Textlänkar i löptext
+            const textContent = container.innerText || container.textContent || '';
+            const textMatches = textContent.match(textUrlRegex) || [];
+            textMatches.forEach(url => addLink(url, selector, 'text'));
+
+            // Vanliga länkar (<a>)
+            container.querySelectorAll('a[href]').forEach(anchor => {
+                addLink(anchor.getAttribute('href') || '', selector, 'länk');
+            });
+
+            // Knappar med länkinfo (ex. data-href, formaction, onclick)
+            container.querySelectorAll('button, [role="button"], input[type="button"], input[type="submit"]').forEach(btn => {
+                addLink(btn.getAttribute('data-href') || '', selector, 'knapp');
+                addLink(btn.getAttribute('formaction') || '', selector, 'knapp');
+
+                const onclick = btn.getAttribute('onclick') || '';
+                const onclickMatches = onclick.match(/https?:\/\/[^\s"'`]+|\/[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]*/g) || [];
+                onclickMatches.forEach(url => addLink(url, selector, 'knapp'));
+            });
+        });
+
+        return Array.from(linkMap.values());
+    }
+
     /* ═══════════ 5. Edit-länk för kategori ═══════════ */
     function addCategoryEditLink() {
         const match = document.body.className.match(/view-category-(\d+)/);
@@ -227,6 +278,54 @@
                 .catch(err => alert('Kunde inte kopiera: ' + err));
         });
         tools.appendChild(copyBtn);
+
+        const listLinksBtn = document.createElement('button');
+        listLinksBtn.type = 'button';
+        listLinksBtn.textContent = '🔗 Lista kategorilänkar';
+        listLinksBtn.style = `${pillStyle};border:0;`;
+
+        const linksPanel = document.createElement('div');
+        linksPanel.style = 'display:none;flex:1 0 100%;margin-top:6px;padding:10px;border:1px solid #f3a4c0;background:#fff7fb;border-radius:4px;font-size:13px;line-height:1.45;word-break:break-word;';
+
+        listLinksBtn.addEventListener('click', () => {
+            const links = collectCategoryLinks(['.category-heading', '.category-lead', '.category-secondary']);
+            if (!links.length) {
+                linksPanel.style.display = 'block';
+                linksPanel.innerHTML = '<strong>Inga länkar hittades i kategorifälten.</strong>';
+                return;
+            }
+
+            const internalLinks = [];
+            const externalLinks = [];
+
+            links.forEach(link => {
+                try {
+                    const url = new URL(link.url);
+                    if (url.hostname === location.hostname) {
+                        internalLinks.push(link.url);
+                    } else {
+                        externalLinks.push(link.url);
+                    }
+                } catch {
+                    // Redan validerad till HTTP/HTTPS i normalizeHttpUrl
+                }
+            });
+
+            const escapeHtml = (value) => value.replace(/[<>&"']/g, ch => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#39;' }[ch]));
+            const renderLinks = (arr) => arr.length
+                ? `<ul style="margin:6px 0 10px 18px;padding:0;">${arr.map(url => `<li style="margin:2px 0;"><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a></li>`).join('')}</ul>`
+                : '<p style="margin:6px 0 10px;">-</p>';
+
+            linksPanel.style.display = 'block';
+            linksPanel.innerHTML = `
+                <div><strong>Interna länkar (${internalLinks.length})</strong></div>
+                ${renderLinks(internalLinks)}
+                <div><strong>Externa länkar (${externalLinks.length})</strong></div>
+                ${renderLinks(externalLinks)}
+            `;
+        });
+        tools.appendChild(listLinksBtn);
+        tools.appendChild(linksPanel);
 
         h1.parentNode.insertBefore(tools, h1.nextSibling);
     }
