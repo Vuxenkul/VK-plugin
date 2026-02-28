@@ -58,6 +58,14 @@ function makeDescriptionTooltip(description) {
   return wrap;
 }
 
+
+function showPopupError(message) {
+  const list = document.getElementById('list');
+  if (!list) return;
+  list.className = 'list-empty';
+  list.textContent = message;
+}
+
 function formatDateTime(timestamp) {
   if (!timestamp) return 'Aldrig';
   try {
@@ -163,10 +171,19 @@ function renderUpdateBanner(update) {
 }
 
 async function checkForUpdates(force = false) {
-  const response = await chrome.runtime.sendMessage({
-    type: force ? 'CHECK_FOR_UPDATES' : 'GET_UPDATE_STATUS'
-  });
-  renderUpdateBanner(response?.update || null);
+  try {
+    const response = await chrome.runtime.sendMessage({
+      type: force ? 'CHECK_FOR_UPDATES' : 'GET_UPDATE_STATUS'
+    });
+    renderUpdateBanner(response?.update || null);
+  } catch (err) {
+    renderUpdateBanner({
+      updateAvailable: false,
+      currentVersion: chrome.runtime.getManifest().version,
+      checkedAt: Date.now(),
+      error: `Kunde inte hämta uppdateringsstatus: ${String(err)}`
+    });
+  }
 }
 
 async function render() {
@@ -180,9 +197,17 @@ async function render() {
     return;
   }
 
-  const response = await chrome.runtime.sendMessage({ type: 'GET_SCRIPTS_FOR_TAB', url: tab.url });
-  const runningMap = await getRunningMap(tab.id);
-  const scripts = response?.scripts || [];
+  let scripts = [];
+  let runningMap = {};
+
+  try {
+    const response = await chrome.runtime.sendMessage({ type: 'GET_SCRIPTS_FOR_TAB', url: tab.url });
+    scripts = response?.scripts || [];
+    runningMap = await getRunningMap(tab.id);
+  } catch (err) {
+    showPopupError(`Kunde inte läsa skriptlista: ${String(err)}`);
+    return;
+  }
 
   list.innerHTML = '';
   list.className = '';
@@ -233,7 +258,9 @@ async function render() {
         enabled: toggle.checked,
         tabId: tab.id
       });
-      render();
+      render().catch((err) => {
+        showPopupError(`Något gick fel i popupen: ${String(err)}`);
+      });
     });
 
     row.appendChild(left);
@@ -276,4 +303,6 @@ async function render() {
   }
 }
 
-render();
+render().catch((err) => {
+  showPopupError(`Något gick fel i popupen: ${String(err)}`);
+});

@@ -239,7 +239,23 @@ async function setScriptEnabled(scriptId, enabled) {
 }
 
 async function getAllScripts() {
-  return Promise.all(BUNDLED_SCRIPTS.map(loadUserscriptMetadata));
+  const results = await Promise.allSettled(BUNDLED_SCRIPTS.map(loadUserscriptMetadata));
+  return results.map((result, index) => {
+    if (result.status === 'fulfilled') {
+      return result.value;
+    }
+
+    const def = BUNDLED_SCRIPTS[index];
+    return {
+      ...def,
+      name: def.id,
+      version: '0.0.0',
+      description: def.fallbackDescription || 'Beskrivning saknas i skriptmetadata.',
+      matches: [],
+      excludes: [],
+      metadataError: String(result.reason || 'Okänt metadatafel')
+    };
+  });
 }
 
 async function injectScript(tabId, script) {
