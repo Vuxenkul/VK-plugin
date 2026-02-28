@@ -22,7 +22,7 @@
       * { box-sizing: border-box; }
       body {
         margin: 0;
-        width: 360px;
+        width: 460px;
         font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
         background: var(--bg);
         color: var(--text);
@@ -168,9 +168,9 @@
 
       .desc-tip {
         position: absolute;
-        left: 50%;
+        right: 0;
         top: 125%;
-        transform: translateX(-50%);
+        transform: none;
         width: 230px;
         padding: 6px 8px;
         border-radius: 8px;
@@ -189,8 +189,8 @@
         content: '';
         position: absolute;
         top: -5px;
-        left: 50%;
-        transform: translateX(-50%) rotate(45deg);
+        right: 10px;
+        transform: rotate(45deg);
         width: 10px;
         height: 10px;
         background: #11323a;
