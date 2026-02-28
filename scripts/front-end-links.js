@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Front-end - Länkar backend / Kopiera varor
-// @version      1.3
+// @version      1.4
 // @match        https://vuxenkul.se/*
 // @exclude      https://vuxenkul.se/
 // @exclude      https://vuxenkul.se/butikadmin/*
@@ -182,6 +182,57 @@
             .join('\n');
     }
 
+    function normalizeHttpUrl(rawUrl) {
+        if (!rawUrl) return '';
+        const trimmed = rawUrl.trim();
+        if (!trimmed) return '';
+
+        try {
+            const url = new URL(trimmed, location.origin);
+            return (url.protocol === 'http:' || url.protocol === 'https:') ? url.href : '';
+        } catch {
+            return '';
+        }
+    }
+
+    function collectCategoryLinks(selectors) {
+        const linkMap = new Map();
+        const textUrlRegex = /(https?:\/\/[^\s<>")']+)/gi;
+
+        const addLink = (url, source, type) => {
+            const normalized = normalizeHttpUrl(url);
+            if (!normalized || linkMap.has(normalized)) return;
+            linkMap.set(normalized, { source, type, url: normalized });
+        };
+
+        selectors.forEach(selector => {
+            const container = document.querySelector(selector);
+            if (!container) return;
+
+            // Textlänkar i löptext
+            const textContent = container.innerText || container.textContent || '';
+            const textMatches = textContent.match(textUrlRegex) || [];
+            textMatches.forEach(url => addLink(url, selector, 'text'));
+
+            // Vanliga länkar (<a>)
+            container.querySelectorAll('a[href]').forEach(anchor => {
+                addLink(anchor.getAttribute('href') || '', selector, 'länk');
+            });
+
+            // Knappar med länkinfo (ex. data-href, formaction, onclick)
+            container.querySelectorAll('button, [role="button"], input[type="button"], input[type="submit"]').forEach(btn => {
+                addLink(btn.getAttribute('data-href') || '', selector, 'knapp');
+                addLink(btn.getAttribute('formaction') || '', selector, 'knapp');
+
+                const onclick = btn.getAttribute('onclick') || '';
+                const onclickMatches = onclick.match(/https?:\/\/[^\s"'`]+|\/[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]*/g) || [];
+                onclickMatches.forEach(url => addLink(url, selector, 'knapp'));
+            });
+        });
+
+        return Array.from(linkMap.values());
+    }
+
     /* ═══════════ 5. Edit-länk för kategori ═══════════ */
     function addCategoryEditLink() {
         const match = document.body.className.match(/view-category-(\d+)/);
@@ -227,6 +278,51 @@
                 .catch(err => alert('Kunde inte kopiera: ' + err));
         });
         tools.appendChild(copyBtn);
+
+        const copyLinksBtn = document.createElement('button');
+        copyLinksBtn.type = 'button';
+        copyLinksBtn.textContent = '🔗 Kopiera kategorilänkar';
+        copyLinksBtn.style = `${pillStyle};border:0;`;
+        copyLinksBtn.addEventListener('click', () => {
+            const links = collectCategoryLinks(['.category-heading', '.category-lead', '.category-secondary']);
+            if (!links.length) {
+                alert('Hittade inga länkar i kategorifälten.');
+                return;
+            }
+
+            const internalLinks = [];
+            const externalLinks = [];
+
+            links.forEach(link => {
+                try {
+                    const url = new URL(link.url);
+                    if (url.hostname === location.hostname) {
+                        internalLinks.push(link.url);
+                    } else {
+                        externalLinks.push(link.url);
+                    }
+                } catch {
+                    // Redan validerad till HTTP/HTTPS i normalizeHttpUrl
+                }
+            });
+
+            const payload = [
+                `Interna länkar (${internalLinks.length})`,
+                ...(internalLinks.length ? internalLinks : ['-']),
+                '',
+                `Externa länkar (${externalLinks.length})`,
+                ...(externalLinks.length ? externalLinks : ['-'])
+            ].join('\n').trim();
+
+            navigator.clipboard.writeText(payload)
+                .then(() => {
+                    const prev = copyLinksBtn.textContent;
+                    copyLinksBtn.textContent = '✅ Länkar kopierade';
+                    setTimeout(() => { copyLinksBtn.textContent = prev; }, 1500);
+                })
+                .catch(err => alert('Kunde inte kopiera länkar: ' + err));
+        });
+        tools.appendChild(copyLinksBtn);
 
         h1.parentNode.insertBefore(tools, h1.nextSibling);
     }
