@@ -18,7 +18,7 @@ async function getRunningMap(tabId) {
 function makeChip(label, yes, extraClass = '') {
   const chip = document.createElement('span');
   chip.className = `chip ${yes ? 'ok' : 'no'} ${extraClass}`.trim();
-  chip.innerHTML = `${label}: <b>${yes ? 'Yes' : 'No'}</b>`;
+  chip.innerHTML = `${label}: <b>${yes ? 'Ja' : 'Nej'}</b>`;
   return chip;
 }
 
@@ -38,11 +38,11 @@ function makeMaterialErrorIcon() {
 }
 
 function formatDateTime(timestamp) {
-  if (!timestamp) return 'Never';
+  if (!timestamp) return 'Aldrig';
   try {
     return new Date(timestamp).toLocaleString();
   } catch (_err) {
-    return 'Unknown';
+    return 'Okänt';
   }
 }
 
@@ -53,18 +53,18 @@ function renderUpdateBanner(update) {
 
   const currentVersion = update?.currentVersion || chrome.runtime.getManifest().version;
   const latestVersion = update?.latestVersion || currentVersion;
-  const checkedText = `Last checked: ${formatDateTime(update?.checkedAt)}`;
+  const checkedText = `Senast kontrollerad: ${formatDateTime(update?.checkedAt)}`;
 
   if (update?.updateAvailable) {
     banner.className = 'update-banner available';
 
     const title = document.createElement('div');
     title.className = 'update-title';
-    title.textContent = `Update available: v${latestVersion}`;
+    title.textContent = `Uppdatering tillgänglig: v${latestVersion}`;
 
     const info = document.createElement('div');
     info.className = 'update-sub';
-    info.textContent = `Current: v${currentVersion}`;
+    info.textContent = `Nuvarande: v${currentVersion}`;
 
     banner.appendChild(title);
     banner.appendChild(info);
@@ -85,19 +85,19 @@ function renderUpdateBanner(update) {
       link.href = update.downloadUrl;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
-      link.textContent = 'Download update';
+      link.textContent = 'Ladda ner uppdatering';
       actions.appendChild(link);
     } else {
       const warn = document.createElement('div');
       warn.className = 'update-sub';
-      warn.textContent = 'Download link missing. Contact admin.';
+      warn.textContent = 'Nedladdningslänk saknas. Kontakta administratör.';
       actions.appendChild(warn);
     }
 
     const refresh = document.createElement('button');
     refresh.className = 'update-btn ghost';
     refresh.type = 'button';
-    refresh.textContent = 'Check again';
+    refresh.textContent = 'Kontrollera igen';
     refresh.addEventListener('click', async () => {
       await checkForUpdates(true);
     });
@@ -116,13 +116,13 @@ function renderUpdateBanner(update) {
 
   const title = document.createElement('div');
   title.className = 'update-title';
-  title.textContent = `Up to date (v${currentVersion})`;
+  title.textContent = `Uppdaterad (v${currentVersion})`;
   banner.appendChild(title);
 
   if (update?.error) {
     const err = document.createElement('div');
     err.className = 'update-sub';
-    err.textContent = `Update check warning: ${update.error}`;
+    err.textContent = `Varning vid uppdateringskontroll: ${update.error}`;
     banner.appendChild(err);
   }
 
@@ -134,7 +134,7 @@ function renderUpdateBanner(update) {
   const refresh = document.createElement('button');
   refresh.className = 'update-btn ghost';
   refresh.type = 'button';
-  refresh.textContent = 'Check again';
+  refresh.textContent = 'Kontrollera igen';
   refresh.addEventListener('click', async () => {
     await checkForUpdates(true);
   });
@@ -155,7 +155,7 @@ async function render() {
   await checkForUpdates(false);
 
   if (!tab || !tab.url || !/^https?:\/\//.test(tab.url)) {
-    list.textContent = 'Open a website tab to evaluate scripts.';
+    list.textContent = 'Öppna en webbflik för att utvärdera skript.';
     return;
   }
 
@@ -168,7 +168,7 @@ async function render() {
 
   if (!scripts.length) {
     list.className = 'list-empty';
-    list.textContent = 'No bundled scripts found.';
+    list.textContent = 'Inga medföljande skript hittades.';
     return;
   }
 
@@ -186,7 +186,7 @@ async function render() {
 
     const meta = document.createElement('div');
     meta.className = 'meta';
-    meta.innerHTML = `v${script.version}<span class="badge">bundled</span>`;
+    meta.innerHTML = `v${script.version}<span class="badge">medföljer</span>`;
 
     left.appendChild(title);
     left.appendChild(meta);
@@ -221,13 +221,13 @@ async function render() {
     const status = document.createElement('div');
     status.className = 'status';
 
-    const matchChip = makeChip('Matches', script.matchesPage, 'match-chip');
+    const matchChip = makeChip('Matchar', script.matchesPage, 'match-chip');
     const dot = document.createElement('span');
     dot.className = `match-dot ${script.matchesPage ? 'on' : ''}`;
     matchChip.prepend(dot);
 
     status.appendChild(matchChip);
-    status.appendChild(makeChip('Ran', ran));
+    status.appendChild(makeChip('Körde', ran));
     card.appendChild(status);
 
     if (runtime.error) {
@@ -235,7 +235,7 @@ async function render() {
       err.className = 'error-row';
       err.appendChild(makeMaterialErrorIcon());
       const text = document.createElement('span');
-      text.textContent = `Could not run: ${runtime.error}`;
+      text.textContent = `Kunde inte köras: ${runtime.error}`;
       err.appendChild(text);
       card.appendChild(err);
     }
@@ -243,7 +243,7 @@ async function render() {
     if (!toggle.checked && ran) {
       const hint = document.createElement('div');
       hint.className = 'hint';
-      hint.textContent = 'Reload tab to fully disable effects.';
+      hint.textContent = 'Ladda om fliken för att helt stänga av effekter.';
       card.appendChild(hint);
     }
 
