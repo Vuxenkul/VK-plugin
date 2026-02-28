@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name         Front-end - Länkar backend / Kopiera varor
+// @name         Front-end Produkter - Adminlänkar och kopieringsverktyg
+// @description  Lägger till snabbknappar på butikssidor för att öppna backend-relaterade länkar och kopiera produktinformation som underlättar redigering och innehållsarbete.
 // @version      1.5
 // @match        https://vuxenkul.se/*
 // @exclude      https://vuxenkul.se/

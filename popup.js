@@ -183,7 +183,25 @@ async function render() {
       const left = document.createElement('div');
       const title = document.createElement('div');
       title.className = 'name';
-      title.textContent = script.name;
+
+      const titleText = document.createElement('span');
+      titleText.textContent = script.name;
+      title.appendChild(titleText);
+
+      if (script.description) {
+        const help = document.createElement('button');
+        help.type = 'button';
+        help.className = 'desc-help';
+        help.setAttribute('aria-label', `Beskrivning: ${script.name}`);
+        help.textContent = '?';
+
+        const tip = document.createElement('span');
+        tip.className = 'desc-tip';
+        tip.textContent = script.description;
+        help.appendChild(tip);
+
+        title.appendChild(help);
+      }
 
       const meta = document.createElement('div');
       meta.className = 'meta';

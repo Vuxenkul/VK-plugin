@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name        Admin Varugrupper – Sök och kopiera URLer (+ UI-förbättringar)
+// @name         Backend Varugrupper - Sök kategorier och kopiera URL-lista
+// @description  Lägger till sökbar kategorilista med breadcrumb-visning i varugrupper och stöd för att kopiera kategoridata/URL:er för snabbare administrativt arbete.
 // @version      1.0
 // @match       https://vuxenkul.se/butikadmin/categories.php
 // ==/UserScript==

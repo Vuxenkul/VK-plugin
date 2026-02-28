@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name         Backend Produkter - Filterregler + filtersök
+// @name         Backend Produkter - Validera filterkrav och sök filter
+// @description  Validerar obligatoriska och villkorade filter på produktsidan, visar en sammanfattning av valda filter och lägger till snabb sökning i filterlistan.
 // @version      1.0
 // @match        https://vuxenkul.se/butikadmin/products.php*
 // ==/UserScript==

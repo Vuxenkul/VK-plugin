@@ -80,6 +80,7 @@ function parseUserscriptMetadata(source) {
   const match = source.match(/\/\/ ==UserScript==([\s\S]*?)\/\/ ==\/UserScript==/);
   const metadata = {
     name: 'Namnlöst skript',
+    description: '',
     version: '0.0.0',
     matches: [],
     excludes: []
@@ -95,6 +96,7 @@ function parseUserscriptMetadata(source) {
     if (!tagMatch) continue;
     const [, tag, value] = tagMatch;
     if (tag === 'name') metadata.name = value.trim();
+    if (tag === 'description') metadata.description = value.trim();
     if (tag === 'version') metadata.version = value.trim();
     if (tag === 'match') metadata.matches.push(value.trim());
     if (tag === 'exclude') metadata.excludes.push(value.trim());
@@ -355,6 +357,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       const result = scripts.map((s) => ({
         id: s.id,
         name: s.name,
+        description: s.description,
         version: s.version,
         matchesPage: scriptMatches(s, message.url),
         enabled: enabledMap[s.id] !== false
