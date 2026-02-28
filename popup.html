@@ -140,6 +140,65 @@
         font-size: 14px;
         font-weight: 700;
         line-height: 1.25;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .desc-help {
+        position: relative;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 14px;
+        text-align: center;
+        background: #fff;
+        cursor: help;
+      }
+      .desc-help:hover,
+      .desc-help:focus-visible {
+        color: var(--vk-cyan);
+        border-color: var(--vk-cyan);
+        outline: none;
+      }
+
+      .desc-tip {
+        position: absolute;
+        left: 50%;
+        top: 125%;
+        transform: translateX(-50%);
+        width: 230px;
+        padding: 6px 8px;
+        border-radius: 8px;
+        background: #11323a;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 500;
+        line-height: 1.35;
+        z-index: 10;
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity .12s ease;
+      }
+      .desc-tip::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: 50%;
+        transform: translateX(-50%) rotate(45deg);
+        width: 10px;
+        height: 10px;
+        background: #11323a;
+      }
+      .desc-help:hover .desc-tip,
+      .desc-help:focus-visible .desc-tip {
+        opacity: 1;
+        visibility: visible;
       }
 
       .meta { font-size: 12px; color: var(--muted); }

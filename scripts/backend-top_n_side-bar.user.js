@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name         Backend –  Topbar sökfunktion +  Vuxenkul Wiki länk
+// @name         Backend Navigation - Topbar-sök och snabb länk till Wiki
+// @description  Lägger till en sökruta i topbaren för snabb navigering i sidomenyn samt en tydlig genväg till Vuxenkul Wiki direkt i backend-gränssnittet.
 // @version      1.0
 // @match        https://vuxenkul.se/butikadmin/*
 // ==/UserScript==

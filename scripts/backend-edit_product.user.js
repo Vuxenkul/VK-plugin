@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name         Backend Produkter - UI förbättringar för produktsidan med kollapsade filterboxar
+// @name         Backend Produkter - Förbättrad produkt-UI med kollapsbara filter
+// @description  Förbättrar layouten i produktredigeringen med tydligare rubriker, kollapsbara filtersektioner och snabbare överblick vid arbete med många filter.
 // @version      1.0
 // @match        https://vuxenkul.se/butikadmin/products.php*
 // ==/UserScript==

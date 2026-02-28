@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name         Backend Produkter - Dölj EN/ES Kort & långbeskrivning
+// @name         Backend Produkter - Växla språkfält i kort/lång beskrivning
+// @description  Grupperar språkversioner för kort och lång beskrivning, visar flaggor och gör det enkelt att växla mellan bara huvudspråk eller alla språkfält.
 // @version      1.0
 // @match        https://vuxenkul.se/butikadmin/products.php*
 // ==/UserScript==

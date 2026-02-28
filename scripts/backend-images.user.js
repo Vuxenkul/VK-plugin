@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name         Backend Hantera Produkter – Zoombara bilder i listor och hantera produkter.
+// @name         Backend Produkter - Bildzoom och galleri i produktvyer
+// @description  Lägger till klickbar bildzoom, lightbox med navigering och extra minigalleri för att snabbare granska produktbilder i både produktlistan och multiedit.
 // @version      1.0
 // @match        https://vuxenkul.se/butikadmin/products.php*
 // @match        https://vuxenkul.se/butikadmin/products_multiedit.php*
