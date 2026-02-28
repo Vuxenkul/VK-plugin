@@ -231,6 +231,16 @@ async function render() {
       status.appendChild(makeChip('Körde', ran));
       card.appendChild(status);
 
+      if (script.loadError) {
+        const err = document.createElement('div');
+        err.className = 'error-row';
+        err.appendChild(makeMaterialErrorIcon());
+        const text = document.createElement('span');
+        text.textContent = `Kunde inte läsa skriptfil: ${script.loadError}`;
+        err.appendChild(text);
+        card.appendChild(err);
+      }
+
       if (runtime.error) {
         const err = document.createElement('div');
         err.className = 'error-row';
