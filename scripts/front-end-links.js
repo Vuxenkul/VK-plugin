@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Front-end - Länkar backend / Kopiera varor
-// @version      1.4
+// @version      1.5
 // @match        https://vuxenkul.se/*
 // @exclude      https://vuxenkul.se/
 // @exclude      https://vuxenkul.se/butikadmin/*
@@ -279,14 +279,19 @@
         });
         tools.appendChild(copyBtn);
 
-        const copyLinksBtn = document.createElement('button');
-        copyLinksBtn.type = 'button';
-        copyLinksBtn.textContent = '🔗 Kopiera kategorilänkar';
-        copyLinksBtn.style = `${pillStyle};border:0;`;
-        copyLinksBtn.addEventListener('click', () => {
+        const listLinksBtn = document.createElement('button');
+        listLinksBtn.type = 'button';
+        listLinksBtn.textContent = '🔗 Lista kategorilänkar';
+        listLinksBtn.style = `${pillStyle};border:0;`;
+
+        const linksPanel = document.createElement('div');
+        linksPanel.style = 'display:none;flex:1 0 100%;margin-top:6px;padding:10px;border:1px solid #f3a4c0;background:#fff7fb;border-radius:4px;font-size:13px;line-height:1.45;word-break:break-word;';
+
+        listLinksBtn.addEventListener('click', () => {
             const links = collectCategoryLinks(['.category-heading', '.category-lead', '.category-secondary']);
             if (!links.length) {
-                alert('Hittade inga länkar i kategorifälten.');
+                linksPanel.style.display = 'block';
+                linksPanel.innerHTML = '<strong>Inga länkar hittades i kategorifälten.</strong>';
                 return;
             }
 
@@ -306,23 +311,21 @@
                 }
             });
 
-            const payload = [
-                `Interna länkar (${internalLinks.length})`,
-                ...(internalLinks.length ? internalLinks : ['-']),
-                '',
-                `Externa länkar (${externalLinks.length})`,
-                ...(externalLinks.length ? externalLinks : ['-'])
-            ].join('\n').trim();
+            const escapeHtml = (value) => value.replace(/[<>&"']/g, ch => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#39;' }[ch]));
+            const renderLinks = (arr) => arr.length
+                ? `<ul style="margin:6px 0 10px 18px;padding:0;">${arr.map(url => `<li style="margin:2px 0;"><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a></li>`).join('')}</ul>`
+                : '<p style="margin:6px 0 10px;">-</p>';
 
-            navigator.clipboard.writeText(payload)
-                .then(() => {
-                    const prev = copyLinksBtn.textContent;
-                    copyLinksBtn.textContent = '✅ Länkar kopierade';
-                    setTimeout(() => { copyLinksBtn.textContent = prev; }, 1500);
-                })
-                .catch(err => alert('Kunde inte kopiera länkar: ' + err));
+            linksPanel.style.display = 'block';
+            linksPanel.innerHTML = `
+                <div><strong>Interna länkar (${internalLinks.length})</strong></div>
+                ${renderLinks(internalLinks)}
+                <div><strong>Externa länkar (${externalLinks.length})</strong></div>
+                ${renderLinks(externalLinks)}
+            `;
         });
-        tools.appendChild(copyLinksBtn);
+        tools.appendChild(listLinksBtn);
+        tools.appendChild(linksPanel);
 
         h1.parentNode.insertBefore(tools, h1.nextSibling);
     }
