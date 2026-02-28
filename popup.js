@@ -46,6 +46,21 @@ function formatDateTime(timestamp) {
   }
 }
 
+function setPopupFavicon(updateAvailable) {
+  const existingFavicon = document.getElementById('popup-favicon');
+  if (!existingFavicon) return;
+
+  const iconFile = updateAvailable ? 'favicon2.png' : 'favicon.png';
+  const cacheBuster = updateAvailable ? 'update' : 'default';
+  const nextHref = `${chrome.runtime.getURL(iconFile)}?v=${cacheBuster}`;
+
+  if (existingFavicon.href === nextHref) return;
+
+  const replacement = existingFavicon.cloneNode(false);
+  replacement.href = nextHref;
+  existingFavicon.parentNode?.replaceChild(replacement, existingFavicon);
+}
+
 function renderUpdateBanner(update) {
   const banner = document.getElementById('update-banner');
   banner.innerHTML = '';
@@ -54,6 +69,7 @@ function renderUpdateBanner(update) {
   const currentVersion = update?.currentVersion || chrome.runtime.getManifest().version;
   const latestVersion = update?.latestVersion || currentVersion;
   const checkedText = `Senast kontrollerad: ${formatDateTime(update?.checkedAt)}`;
+  setPopupFavicon(!!update?.updateAvailable);
 
   if (update?.updateAvailable) {
     banner.className = 'update-banner available';
