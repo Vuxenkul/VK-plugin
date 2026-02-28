@@ -150,104 +150,109 @@ async function checkForUpdates(force = false) {
 
 async function render() {
   const list = document.getElementById('list');
-  const tab = await getActiveTab();
+  try {
+    const tab = await getActiveTab();
 
-  await checkForUpdates(false);
+    await checkForUpdates(false);
 
-  if (!tab || !tab.url || !/^https?:\/\//.test(tab.url)) {
-    list.textContent = 'Öppna en webbflik för att utvärdera skript.';
-    return;
-  }
+    if (!tab || !tab.url || !/^https?:\/\//.test(tab.url)) {
+      list.textContent = 'Öppna en webbflik för att utvärdera skript.';
+      return;
+    }
 
-  const response = await chrome.runtime.sendMessage({ type: 'GET_SCRIPTS_FOR_TAB', url: tab.url });
-  const runningMap = await getRunningMap(tab.id);
-  const scripts = response?.scripts || [];
+    const response = await chrome.runtime.sendMessage({ type: 'GET_SCRIPTS_FOR_TAB', url: tab.url });
+    const runningMap = await getRunningMap(tab.id);
+    const scripts = response?.scripts || [];
 
-  list.innerHTML = '';
-  list.className = '';
+    list.innerHTML = '';
+    list.className = '';
 
-  if (!scripts.length) {
-    list.className = 'list-empty';
-    list.textContent = 'Inga medföljande skript hittades.';
-    return;
-  }
+    if (!scripts.length) {
+      list.className = 'list-empty';
+      list.textContent = 'Inga medföljande skript hittades.';
+      return;
+    }
 
-  for (const script of scripts) {
-    const card = document.createElement('div');
-    card.className = 'item';
+    for (const script of scripts) {
+      const card = document.createElement('div');
+      card.className = 'item';
 
-    const row = document.createElement('div');
-    row.className = 'top';
+      const row = document.createElement('div');
+      row.className = 'top';
 
-    const left = document.createElement('div');
-    const title = document.createElement('div');
-    title.className = 'name';
-    title.textContent = script.name;
+      const left = document.createElement('div');
+      const title = document.createElement('div');
+      title.className = 'name';
+      title.textContent = script.name;
 
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    meta.innerHTML = `v${script.version}<span class="badge">medföljer</span>`;
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.innerHTML = `v${script.version}<span class="badge">medföljer</span>`;
 
-    left.appendChild(title);
-    left.appendChild(meta);
+      left.appendChild(title);
+      left.appendChild(meta);
 
-    const toggleWrap = document.createElement('label');
-    toggleWrap.className = 'switch';
-    const toggle = document.createElement('input');
-    toggle.type = 'checkbox';
-    toggle.checked = script.enabled;
-    const slider = document.createElement('span');
-    slider.className = 'slider';
-    toggleWrap.appendChild(toggle);
-    toggleWrap.appendChild(slider);
+      const toggleWrap = document.createElement('label');
+      toggleWrap.className = 'switch';
+      const toggle = document.createElement('input');
+      toggle.type = 'checkbox';
+      toggle.checked = script.enabled;
+      const slider = document.createElement('span');
+      slider.className = 'slider';
+      toggleWrap.appendChild(toggle);
+      toggleWrap.appendChild(slider);
 
-    toggle.addEventListener('change', async () => {
-      await chrome.runtime.sendMessage({
-        type: 'SET_SCRIPT_ENABLED',
-        scriptId: script.id,
-        enabled: toggle.checked,
-        tabId: tab.id
+      toggle.addEventListener('change', async () => {
+        await chrome.runtime.sendMessage({
+          type: 'SET_SCRIPT_ENABLED',
+          scriptId: script.id,
+          enabled: toggle.checked,
+          tabId: tab.id
+        });
+        render();
       });
-      render();
-    });
 
-    row.appendChild(left);
-    row.appendChild(toggleWrap);
-    card.appendChild(row);
+      row.appendChild(left);
+      row.appendChild(toggleWrap);
+      card.appendChild(row);
 
-    const runtime = runningMap[script.id] || {};
-    const ran = !!runtime.ran;
+      const runtime = runningMap[script.id] || {};
+      const ran = !!runtime.ran;
 
-    const status = document.createElement('div');
-    status.className = 'status';
+      const status = document.createElement('div');
+      status.className = 'status';
 
-    const matchChip = makeChip('Matchar', script.matchesPage, 'match-chip');
-    const dot = document.createElement('span');
-    dot.className = `match-dot ${script.matchesPage ? 'on' : ''}`;
-    matchChip.prepend(dot);
+      const matchChip = makeChip('Matchar', script.matchesPage, 'match-chip');
+      const dot = document.createElement('span');
+      dot.className = `match-dot ${script.matchesPage ? 'on' : ''}`;
+      matchChip.prepend(dot);
 
-    status.appendChild(matchChip);
-    status.appendChild(makeChip('Körde', ran));
-    card.appendChild(status);
+      status.appendChild(matchChip);
+      status.appendChild(makeChip('Körde', ran));
+      card.appendChild(status);
 
-    if (runtime.error) {
-      const err = document.createElement('div');
-      err.className = 'error-row';
-      err.appendChild(makeMaterialErrorIcon());
-      const text = document.createElement('span');
-      text.textContent = `Kunde inte köras: ${runtime.error}`;
-      err.appendChild(text);
-      card.appendChild(err);
+      if (runtime.error) {
+        const err = document.createElement('div');
+        err.className = 'error-row';
+        err.appendChild(makeMaterialErrorIcon());
+        const text = document.createElement('span');
+        text.textContent = `Kunde inte köras: ${runtime.error}`;
+        err.appendChild(text);
+        card.appendChild(err);
+      }
+
+      if (!toggle.checked && ran) {
+        const hint = document.createElement('div');
+        hint.className = 'hint';
+        hint.textContent = 'Ladda om fliken för att helt stänga av effekter.';
+        card.appendChild(hint);
+      }
+
+      list.appendChild(card);
     }
-
-    if (!toggle.checked && ran) {
-      const hint = document.createElement('div');
-      hint.className = 'hint';
-      hint.textContent = 'Ladda om fliken för att helt stänga av effekter.';
-      card.appendChild(hint);
-    }
-
-    list.appendChild(card);
+  } catch (err) {
+    list.className = 'list-empty';
+    list.textContent = `Kunde inte läsa skriptstatus: ${String(err)}`;
   }
 }
 
