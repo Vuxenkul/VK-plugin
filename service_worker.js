@@ -37,19 +37,8 @@ const UPDATE_MANIFEST_URL = 'https://wiki.vuxenkul.se/public/vk-plugin/latest.js
 const UPDATE_STATE_KEY = 'updateState';
 const UPDATE_CHECK_MIN_INTERVAL_MS = 60 * 60 * 1000;
 
-const DEFAULT_ACTION_ICON_PATHS = {
-  16: 'favicon.png',
-  32: 'favicon.png',
-  48: 'favicon.png',
-  128: 'favicon.png'
-};
-
-const UPDATE_ACTION_ICON_PATHS = {
-  16: 'favicon2.png',
-  32: 'favicon2.png',
-  48: 'favicon2.png',
-  128: 'favicon2.png'
-};
+const DEFAULT_ACTION_ICON = 'favicon.png';
+const UPDATE_ACTION_ICON = 'favicon2.png';
 
 const metadataCache = new Map();
 
@@ -195,7 +184,7 @@ async function setUpdateState(state) {
 }
 
 async function setActionIconFromUpdateState(state) {
-  const path = state?.updateAvailable ? UPDATE_ACTION_ICON_PATHS : DEFAULT_ACTION_ICON_PATHS;
+  const path = state?.updateAvailable ? UPDATE_ACTION_ICON : DEFAULT_ACTION_ICON;
   try {
     await chrome.action.setIcon({ path });
   } catch (_err) {

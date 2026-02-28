@@ -47,12 +47,18 @@ function formatDateTime(timestamp) {
 }
 
 function setPopupFavicon(updateAvailable) {
-  const favicon = document.getElementById('popup-favicon');
-  if (!favicon) return;
+  const existingFavicon = document.getElementById('popup-favicon');
+  if (!existingFavicon) return;
 
   const iconFile = updateAvailable ? 'favicon2.png' : 'favicon.png';
   const cacheBuster = updateAvailable ? 'update' : 'default';
-  favicon.href = `${chrome.runtime.getURL(iconFile)}?v=${cacheBuster}`;
+  const nextHref = `${chrome.runtime.getURL(iconFile)}?v=${cacheBuster}`;
+
+  if (existingFavicon.href === nextHref) return;
+
+  const replacement = existingFavicon.cloneNode(false);
+  replacement.href = nextHref;
+  existingFavicon.parentNode?.replaceChild(replacement, existingFavicon);
 }
 
 function renderUpdateBanner(update) {
