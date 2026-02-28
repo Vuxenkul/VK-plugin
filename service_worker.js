@@ -37,6 +37,20 @@ const UPDATE_MANIFEST_URL = 'https://wiki.vuxenkul.se/public/vk-plugin/latest.js
 const UPDATE_STATE_KEY = 'updateState';
 const UPDATE_CHECK_MIN_INTERVAL_MS = 60 * 60 * 1000;
 
+const DEFAULT_ACTION_ICON_PATHS = {
+  16: 'favicon.png',
+  32: 'favicon.png',
+  48: 'favicon.png',
+  128: 'favicon.png'
+};
+
+const UPDATE_ACTION_ICON_PATHS = {
+  16: 'favicon2.png',
+  32: 'favicon2.png',
+  48: 'favicon2.png',
+  128: 'favicon2.png'
+};
+
 const metadataCache = new Map();
 
 async function loadUserscriptMetadata(scriptDef) {
@@ -180,6 +194,15 @@ async function setUpdateState(state) {
   await chrome.storage.local.set({ [UPDATE_STATE_KEY]: state });
 }
 
+async function setActionIconFromUpdateState(state) {
+  const path = state?.updateAvailable ? UPDATE_ACTION_ICON_PATHS : DEFAULT_ACTION_ICON_PATHS;
+  try {
+    await chrome.action.setIcon({ path });
+  } catch (_err) {
+    // Ignore icon swap errors (for example when fallback icon file isn't packaged yet).
+  }
+}
+
 function sanitizeDownloadUrl(url) {
   if (!url) return null;
   try {
@@ -204,6 +227,7 @@ async function checkForExtensionUpdate({ force = false } = {}) {
   const previous = await getUpdateState();
 
   if (!force && previous.checkedAt && now - previous.checkedAt < UPDATE_CHECK_MIN_INTERVAL_MS) {
+    await setActionIconFromUpdateState(previous);
     return previous;
   }
 
@@ -233,6 +257,7 @@ async function checkForExtensionUpdate({ force = false } = {}) {
     };
 
     await setUpdateState(state);
+    await setActionIconFromUpdateState(state);
     return state;
   } catch (err) {
     const state = {
@@ -242,6 +267,7 @@ async function checkForExtensionUpdate({ force = false } = {}) {
       error: String(err)
     };
     await setUpdateState(state);
+    await setActionIconFromUpdateState(state);
     return state;
   }
 }

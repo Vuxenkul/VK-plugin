@@ -47,9 +47,12 @@ function formatDateTime(timestamp) {
 }
 
 function setPopupFavicon(updateAvailable) {
-  const favicon = document.querySelector('link[rel~="icon"]');
+  const favicon = document.getElementById('popup-favicon');
   if (!favicon) return;
-  favicon.href = updateAvailable ? 'favicon2.png' : 'favicon.png';
+
+  const iconFile = updateAvailable ? 'favicon2.png' : 'favicon.png';
+  const cacheBuster = updateAvailable ? 'update' : 'default';
+  favicon.href = `${chrome.runtime.getURL(iconFile)}?v=${cacheBuster}`;
 }
 
 function renderUpdateBanner(update) {
