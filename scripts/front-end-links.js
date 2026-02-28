@@ -166,6 +166,22 @@
         });
     }
 
+
+    function getCleanText(selector) {
+        const source = document.querySelector(selector);
+        if (!source) return '';
+
+        const clone = source.cloneNode(true);
+        clone.querySelectorAll('style,script,noscript,template').forEach(el => el.remove());
+
+        const raw = (clone.innerText || clone.textContent || '');
+        return raw
+            .split('\n')
+            .map(line => line.trim())
+            .filter(Boolean)
+            .join('\n');
+    }
+
     /* ═══════════ 5. Edit-länk för kategori ═══════════ */
     function addCategoryEditLink() {
         const match = document.body.className.match(/view-category-(\d+)/);
@@ -192,11 +208,11 @@
         copyBtn.textContent = '📋 Kopiera kategoritext';
         copyBtn.style = `${pillStyle};border:0;`;
         copyBtn.addEventListener('click', () => {
-            const categoryHeading = document.querySelector('.category-heading')?.textContent?.trim() || '';
-            const categoryLead = document.querySelector('.category-lead')?.textContent?.trim() || '';
-            const categorySecondary = document.querySelector('.category-secondary')?.textContent?.trim() || '';
+            const categoryHeading = getCleanText('.category-heading');
+            const categoryLead = getCleanText('.category-lead');
+            const categorySecondary = getCleanText('.category-secondary');
 
-            const payload = [categoryHeading, categoryLead, categorySecondary].join('\n\n').trim();
+            const payload = [categoryHeading, categoryLead, categorySecondary].filter(Boolean).join('\n\n').trim();
             if (!payload) {
                 alert('Hittade ingen kategoritext att kopiera.');
                 return;
